@@ -1,0 +1,38 @@
+[
+    {
+        "disease": "Tomato Early Blight",
+        "scientific_name": "Alternaria solani",
+        "explanation": "Early blight is a common fungal disease that affects the foliage, stems, and fruits of tomatoes. It is characterized by dark brown spots with concentric rings, often appearing first on older leaves.",
+        "causes": "Caused by the fungus Alternaria solani. It thrives in warm, humid conditions and can be spread by wind, water, and infected tools or seeds. Spores can overwinter in soil and plant debris.",
+        "chemical_treatment": "Apply fungicides containing Azoxystrobin, Chlorothalonil, or Mancozeb. Copper-based sprays are also effective if applied early.",
+        "organic_treatment": "Use Neem oil sprays or a solution of potassium bicarbonate (baking soda). Increase air circulation and keep foliage dry.",
+        "preventive_measures": "Rotate crops every 3 years. Use disease-free seeds. Mulch around plants to prevent soil splashing onto leaves. Prune lower leaves to improve airflow."
+    },
+    {
+        "disease": "Tomato Late Blight",
+        "scientific_name": "Phytophthora infestans",
+        "explanation": "Late blight is a devastating disease that can rapidly kill entire tomato plants. It appears as large, olive-green to brown water-soaked spots on leaves and stems, with white fungal growth on the undersides during humid weather.",
+        "causes": "Caused by the oomycete Phytophthora infestans. It spreads rapidly through wind-blown spores in cool, wet weather. It is the same pathogen that caused the Irish Potato Famine.",
+        "chemical_treatment": "Use systemic fungicides like Metalaxyl + Mancozeb (Ridomil Gold) or Fosetyl-Al. Preventive sprays are crucial during high-risk weather (cool and wet).",
+        "organic_treatment": "Apply copper-based fungicides (Bordeaux mixture). Remove and destroy all infected plant material immediately. Avoid overhead irrigation.",
+        "preventive_measures": "Plant resistant varieties. Ensure wide spacing for maximum air circulation. Avoid planting tomatoes near potatoes. Destroy volunteer plants."
+    },
+    {
+        "disease": "Potato Late Blight",
+        "scientific_name": "Phytophthora infestans",
+        "explanation": "Late blight in potatoes affects both the foliage and the tubers. It causes dark, water-soaked patches on leaves and can lead to a reddish-brown rot in the tubers, making them unfit for consumption.",
+        "causes": "Caused by Phytophthora infestans. High humidity and temperatures between 10-24\u00b0C are highly conducive. Spread occurs primarily via airborne sporangia.",
+        "chemical_treatment": "Apply protective fungicides such as Mancozeb or Chlorothalonil. Systemic fungicides like Cyazofamid or Fluazinam are also effective.",
+        "organic_treatment": "Copper-based compounds. Use certified disease-free seed tubers. Solarization of soil can help in small gardens.",
+        "preventive_measures": "Destroy cull piles and volunteers. Harvest only during dry weather. Store tubers in cool, well-ventilated areas."
+    },
+    {
+        "disease": "Rice Blast",
+        "scientific_name": "Magnaporthe oryzae",
+        "explanation": "Rice blast is one of the most destructive diseases of rice worldwide. It affects leaves (leaf blast), nodes, and panicles (neck blast), causing diamond-shaped lesions with gray centers.",
+        "causes": "Caused by the fungus Magnaporthe oryzae. High nitrogen fertilization, aerobic soil conditions, and long periods of leaf wetness favor the disease.",
+        "chemical_treatment": "Manage with fungicides like Tricyclazole, Azoxystrobin, or Edifenphos. Seed treatment is also recommended.",
+        "organic_treatment": "Use bio-control agents like Pseudomonas fluorescens. Balance nitrogen usage with silicon-based fertilizers.",
+        "preventive_measures": "Use resistant varieties. Avoid excessive nitrogen. Monitor water levels to prevent drought stress, which predisposes plants to blast."
+    }
+]

@@ -1,0 +1,17 @@
+Pepper__Bacterial_Spot
+Pepper__Healthy
+Potato__Early_Blight
+Potato__Healthy
+Potato__Late_Blight
+Tomato__Bacterial_Spot
+Tomato__Early_Blight
+Tomato__Healthy
+Tomato__Late_Blight
+Tomato__Leaf_Mold
+Tomato__Leaf_Spot
+Tomato__Mite_Damage
+Tomato__Fungal_Spot
+Tomato__Viral_Mosaic
+Rice__Bacterial_leaf_blight
+Rice__Brown_spot
+Rice__Leaf_smut

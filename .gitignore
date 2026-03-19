@@ -1,0 +1,66 @@
+# Virtual Environments
+.venv/
+venv/
+backend/venv_backend/
+env/
+ENV/
+
+# Node Modules
+node_modules/
+web/node_modules/
+mobile/node_modules/
+
+# Build and Output
+web/.next/
+mobile/.expo/
+dist/
+build/
+*.log
+backend/backend_output.log
+backend/backend_output_utf8.log
+backend/error.log
+backend/error_traceback.log
+backend/import_trace.log
+backend/train_output.log
+backend/diagnose_output.txt
+backend/diagnose_output_v2.txt
+backend/full_traceback.txt
+backend/out.log
+backend/web_output_utf8.log
+web/web_output.log
+web/web_start_error.log
+web/web_start_error_utf8.log
+web/dev_error.log
+web/dev_error_utf8.log
+build_log.txt
+
+# Databases
+*.db
+*.sqlite3
+sql_app.db
+backend/sql_app.db
+
+# ML Datasets and Models
+backend/dataset_unified/
+backend/downloads/
+backend/uploads/
+*.h5
+*.pth
+*.onnx
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Tools and IDEs
+.agent/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore

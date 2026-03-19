@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=agrocure
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/agrocure
+      - SECRET_KEY=CHANGE_THIS_IN_PRODUCTION
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    depends_on:
+      - db
+  # web:
+  #   build:
+  #     context: ./web
+  #     args:
+  #       NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+  #   depends_on:
+  #     - backend
+
+volumes:
+  postgres_data:

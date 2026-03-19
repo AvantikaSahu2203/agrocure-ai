@@ -1,0 +1,40 @@
+Label Counts:
+normalized_label
+Tomato__Viral_Mosaic           3581
+Tomato__Bacterial_Spot         2127
+Tomato__Late_Blight            1901
+Tomato__Leaf_Spot              1771
+Tomato__Mite_Damage            1676
+Tomato__Healthy                1585
+Pepper__Healthy                1478
+Tomato__Fungal_Spot            1404
+Potato__Late_Blight            1000
+Potato__Early_Blight           1000
+Tomato__Early_Blight           1000
+Pepper__Bacterial_Spot          997
+Tomato__Leaf_Mold               952
+Potato__Healthy                 152
+Rice__Bacterial_leaf_blight      40
+Rice__Brown_spot                 40
+Rice__Leaf_smut                  40
+
+Matches for Healthy:
+normalized_label
+Tomato__Healthy    1585
+Pepper__Healthy    1478
+Potato__Healthy     152
+
+Matches for Blight:
+normalized_label
+Tomato__Late_Blight            1901
+Potato__Early_Blight           1000
+Potato__Late_Blight            1000
+Tomato__Early_Blight           1000
+Rice__Bacterial_leaf_blight      40
+
+Matches for Powdery_Mildew:
+Series([], )
+
+Matches for Leaf_Spot:
+normalized_label
+Tomato__Leaf_Spot    1771

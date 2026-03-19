@@ -1,0 +1,57 @@
+[
+    {
+        "disease": "Leaf Spot",
+        "chemical_medicine": "Mancozeb",
+        "organic_remedy": "Neem Oil"
+    },
+    {
+        "disease": "Powdery Mildew",
+        "chemical_medicine": "Sulfur Spray",
+        "organic_remedy": "Baking Soda Spray"
+    },
+    {
+        "disease": "Early Blight",
+        "chemical_medicine": "Mancozeb",
+        "organic_remedy": "Neem Oil or Compost Tea"
+    },
+    {
+        "disease": "Late Blight",
+        "chemical_medicine": "Copper Oxychloride or Ridomil Gold",
+        "organic_remedy": "Bordeaux Mixture"
+    },
+    {
+        "disease": "Aphids",
+        "chemical_medicine": "Imidacloprid",
+        "organic_remedy": "Soapy Water Spray"
+    },
+    {
+        "disease": "Rust",
+        "chemical_medicine": "Propiconazole or Mancozeb",
+        "organic_remedy": "Sulfur-based fungicides"
+    },
+    {
+        "disease": "Blast",
+        "chemical_medicine": "Tricyclazole",
+        "organic_remedy": "Pseudomonas fluorescens"
+    },
+    {
+        "disease": "Anthracnose",
+        "chemical_medicine": "Copper Oxychloride",
+        "organic_remedy": "Neem Oil (5ml/L)"
+    },
+    {
+        "disease": "Boll Rot",
+        "chemical_medicine": "Copper Oxychloride",
+        "organic_remedy": "Trichoderma viride seed treatment"
+    },
+    {
+        "disease": "Leaf Mold",
+        "chemical_medicine": "Difenoconazole",
+        "organic_remedy": "Sulfur dusts"
+    },
+    {
+        "disease": "Wilt",
+        "chemical_medicine": "Carbendazim",
+        "organic_remedy": "Trichoderma viride or Pseudomonas"
+    }
+]
