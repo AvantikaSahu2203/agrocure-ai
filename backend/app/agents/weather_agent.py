@@ -32,14 +32,19 @@ class WeatherRiskAgent(BaseAgent):
              # Fetch real weather
              weather_data = get_current_weather(lat, lon)
              if "main" in weather_data:
-                 temp = weather_data["main"].get("temp", 25.0)
-                 humidity = weather_data["main"].get("humidity", 60.0)
+                 main = weather_data.get("main", {})
+                 fetched_temp = main.get("temp")
+                 fetched_hum = main.get("humidity")
+                 
+                 if temp is None: temp = fetched_temp
+                 if humidity is None: humidity = fetched_hum
+                 
                  # Simple check for rain in description
                  weather_desc = weather_data.get("weather", [{}])[0].get("main", "")
                  if rain is None:
                     rain = "Rain" in weather_desc
         
-        # Default fallbacks
+        # Default fallbacks (handles both None from input and None from API failure)
         if humidity is None: humidity = 60.0
         if temp is None: temp = 25.0
         if rain is None: rain = False

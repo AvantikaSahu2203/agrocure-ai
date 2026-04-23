@@ -1,5 +1,5 @@
 from .token import Token, TokenPayload
-from .user import User, UserCreate, UserInDB, UserUpdate
+from .user import User, UserCreate, UserInDB, UserUpdate, UserLogin
 from .crop import Crop, CropCreate, CropInDB, CropUpdate
 from .disease import DiseaseDetection, DiseaseDetectionCreate, DiseaseDetectionInDB, DiseaseDetectionUpdate
 from .store import Store, StoreCreate, StoreInDBBase, StoreUpdate

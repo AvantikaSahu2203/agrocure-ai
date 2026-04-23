@@ -5,7 +5,7 @@ from app.services.medicine_service import medicine_service
 class MedicineRecommendationAgent(BaseAgent):
     """
     Agent responsible for recommending treatments.
-    Uses centralized MedicineRecommendationService.
+    Uses centralized MedicineRecommendationService with high-quality disease data.
     """
     
     def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -19,36 +19,46 @@ class MedicineRecommendationAgent(BaseAgent):
         disease_name = input_data.get("disease_name", "Unknown")
         crop_name = input_data.get("crop_name", "")
         
-        # Use centralized service
-        meds = medicine_service.get_recommendation(disease_name)
+        # Use centralized service with crop context for high precision
+        med_info = medicine_service.get_recommendation(disease_name, crop_name)
         
-        # Define specific dosages and methods (Objective 3)
-        # In a real app, this would come from a refined DB.
-        chemical_list = [meds["chemical_medicine"]]
-        organic_list = [meds["organic_remedy"]]
+        # Extract fields from our rich database result
+        chemical_name = med_info.get("chemical_medicine", "Broad-spectrum Fungicide")
+        organic_name = med_info.get("organic_remedy", "Neem Oil Spray")
+        dosage = med_info.get("dosage", "2g/L for powders, 2ml/L for liquids")
         
-        # Add a generic fallback if needed
-        if "None" not in meds["chemical_medicine"] and "Consult" not in meds["chemical_medicine"]:
-            if "Mancozeb" not in meds["chemical_medicine"]:
-                chemical_list.append("Mancozeb (Generic Protective Fungicide)")
+        # Handle lists or strings for recommendations
+        base_preventative = [
+            "Rotate crops every season",
+            "Ensure balanced soil nutrition (N-P-K)",
+            "Space plants for proper air movement",
+            "Remove and burn infected leaves early"
+        ]
         
-        if "Neem" not in meds["organic_remedy"]:
-            organic_list.append("Neem Oil (General Organic Control)")
+        db_recs = med_info.get("recommendations", [])
+        if isinstance(db_recs, list) and len(db_recs) > 0:
+            preventative_measures = db_recs + base_preventative
+        else:
+            preventative_measures = base_preventative
 
-        dosage = "2g/L of water for powders, 2ml/L for liquids. Spray every 7-10 days."
-        if "Healthy" in disease_name:
-            dosage = "N/A"
+        # Limit to unique measures
+        preventative_measures = list(dict.fromkeys(preventative_measures))[:5]
+
+        # Handle Healthy case
+        application_method = "Foliar Spray"
+        frequency = "Once every 7-10 days until symptoms subside"
+        
+        if "Healthy" in disease_name or "None" in chemical_name:
+            application_method = "Standard Maintenance"
+            frequency = "As per seasonal schedule"
+            if "Healthy" in disease_name:
+                dosage = "N/A"
 
         return {
-            "chemical_treatments": chemical_list[:2],
-            "organic_treatments": organic_list[:1],
+            "chemical_treatments": [chemical_name],
+            "organic_treatments": [organic_name],
             "dosage": dosage,
-            "application_method": "Foliar Spray",
-            "frequency": "Once every 7 days until symptoms subside",
-            "preventative_measures": [
-                "Rotate crops every season",
-                "Ensure balanced soil nutrition (N-P-K)",
-                "Space plants for proper air movement",
-                "Remove and burn infected leaves early"
-            ]
+            "application_method": application_method,
+            "frequency": frequency,
+            "preventative_measures": preventative_measures
         }

@@ -13,13 +13,18 @@ class CRUDUser:
     def get_by_email(self, db: Session, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
+    def get_by_phone(self, db: Session, phone_number: str) -> Optional[User]:
+        return db.query(User).filter(User.phone_number == phone_number).first()
+
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         db_obj = User(
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
             role=obj_in.role,
-            phone_number=obj_in.phone_number
+            phone_number=obj_in.phone_number,
+            verification_code=obj_in.verification_code,
+            is_verified=obj_in.is_verified
         )
         db.add(db_obj)
         db.commit()

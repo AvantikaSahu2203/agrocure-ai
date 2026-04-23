@@ -9,9 +9,9 @@ router = APIRouter()
 @router.post("/get-advice", response_model=AdvisoryResponse)
 def get_crop_advice(
     data: AdvisoryRequest,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.get_current_active_user)
 ):
     """
     Get comprehensive crop advisory based on weather, growth stage, and soil data.
     """
-    return generate_crop_advice(data)
+    return generate_crop_advice(data, current_user)

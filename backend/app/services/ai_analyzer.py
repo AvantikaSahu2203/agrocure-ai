@@ -12,335 +12,7 @@ from app.services.llm_service import AgriLLMService
 from app.services.medicine_service import MedicineRecommendationService
 from typing import Dict, List, Optional
 
-# Common crop diseases database
-DISEASE_DATABASE = {
-    "tomato": [
-        {
-            "name": "Early Blight",
-            "scientific_name": "Alternaria solani",
-            "cause": "Fungal infection due to high humidity and warm weather",
-            "symptoms": ["Yellow leaves with brown circular spots", "Leaves drying from the bottom", "Target-like rings on spots"],
-            "severity_indicators": ["spot_size", "leaf_coverage", "yellowing"],
-            "chemical_treatment": "Amistar (Azoxystrobin) or Kavach (Chlorothalonil)",
-            "organic_treatment": "Neem oil or Baking soda solution (5g/L)",
-            "dosage": "2ml per liter of water, spray every 10 days",
-            "recommendations": [
-                "Remove affected leaves immediately",
-                "Apply fungicide containing chlorothalonil or azoxystrobin",
-                "Improve air circulation around plants",
-                "Avoid overhead watering"
-            ]
-        },
-        {
-            "name": "Late Blight",
-            "scientific_name": "Phytophthora infestans",
-            "cause": "Fungal infection spreading rapidly in cool, wet weather",
-            "symptoms": ["Dark water-soaked patches on leaves", "White fuzzy growth on leaf undersides", "Plants wilting quickly"],
-            "severity_indicators": ["lesion_size", "spread_rate", "fungal_growth"],
-            "chemical_treatment": "Ridomil Gold (Metalaxyl + Mancozeb)",
-            "organic_treatment": "Copper-based fungicides (Bordeaux mixture)",
-            "dosage": "2.5g per liter, spray immediately upon detection",
-            "recommendations": [
-                "Apply copper-based fungicides immediately",
-                "Remove and destroy infected plants",
-                "Ensure proper spacing for air circulation",
-                "Monitor weather conditions closely"
-            ]
-        },
-        {
-            "name": "Leaf Mold",
-            "scientific_name": "Passalora fulva",
-            "cause": "Fungal disease caused by high humidity and poor ventilation",
-            "symptoms": ["Hazy yellow spots on upper leaves", "Velvety olive-green mold on the bottom of leaves", "Leaves curling and dropping"],
-            "severity_indicators": ["spot_density", "coating_coverage"],
-            "chemical_treatment": "Score (Difenoconazole)",
-            "organic_treatment": "Sulfur dust or biological controls (Bacillus subtilis)",
-            "dosage": "1ml per liter, apply every 14 days",
-            "recommendations": [
-                "Reduce humidity in growing area",
-                "Improve ventilation",
-                "Apply fungicides if severe",
-                "Remove heavily infected leaves"
-            ]
-        }
-    ],
-    "potato": [
-        {
-            "name": "Late Blight",
-            "scientific_name": "Phytophthora infestans",
-            "symptoms": ["Dark water-soaked lesions", "White mold on undersides", "Tuber rot"],
-            "severity_indicators": ["lesion_coverage", "tuber_damage"],
-            "chemical_treatment": "Ridomil Gold or Indofil M-45 (Mancozeb)",
-            "organic_treatment": "Copper oxychloride",
-            "dosage": "3g per liter, preventive spray recommended",
-            "recommendations": [
-                "Apply protective fungicides",
-                "Destroy infected plants",
-                "Harvest early if disease is severe",
-                "Store only healthy tubers"
-            ]
-        }
-    ],
-    "wheat": [
-        {
-            "name": "Rust",
-            "scientific_name": "Puccinia spp.",
-            "cause": "Fungal spores spread by wind",
-            "symptoms": ["Orange-red powdery spots on leaves", "Yellow circles around the spots", "Leaves turning dry"],
-            "severity_indicators": ["pustule_density", "leaf_coverage"],
-            "chemical_treatment": "Tilt (Propiconazole) or Follicur (Tebuconazole)",
-            "organic_treatment": "Remove infected plants, avoid nitrogen excess",
-            "dosage": "1ml per liter at flag leaf stage",
-            "recommendations": [
-                "Apply fungicides at first sign",
-                "Use resistant varieties",
-                "Remove volunteer wheat plants",
-                "Monitor weather conditions"
-            ]
-        }
-    ],
-    "rice": [
-        {
-            "name": "Blast",
-            "scientific_name": "Magnaporthe oryzae",
-            "cause": "Fungal infection triggered by high nitrogen and humid nights",
-            "symptoms": ["Boat-shaped or diamond-shaped spots on leaves", "Gray centers with brown borders", "Neck of the plant turning black and breaking"],
-            "severity_indicators": ["lesion_count", "panicle_infection"],
-            "chemical_treatment": "Baan (Tricyclazole) or Hinosan (Edifenphos)",
-            "organic_treatment": "Pseudomonas fluorescens (Bio-control)",
-            "dosage": "0.6g per liter, spray at tillering stage",
-            "recommendations": [
-                "Apply tricyclazole or azoxystrobin",
-                "Manage nitrogen fertilization",
-                "Ensure proper water management",
-                "Use resistant varieties"
-            ]
-        }
-    ],
-    "cotton": [
-        {
-            "name": "Boll Rot",
-            "scientific_name": "Colletotrichum capsici",
-            "symptoms": ["Brown water-soaked spots on bolls", "Bolls fail to open", "Internal lint decay"],
-            "chemical_treatment": "Blitox (Copper Oxychloride)",
-            "organic_treatment": "Seed treatment with Trichoderma viride",
-            "dosage": "2.5g per liter, spray during boll development",
-            "recommendations": [
-                "Avoid excessive nitrogen",
-                "Ensure proper plant spacing",
-                "Remove and burn infected bolls"
-            ]
-        }
-    ],
-    "mango": [
-        {
-            "name": "Anthracnose",
-            "scientific_name": "Colletotrichum gloeosporioides",
-            "symptoms": ["Black slightly sunken spots on fruits", "Leaft tip dieback", "Blossom blight"],
-            "chemical_treatment": "Contaf (Hexaconazole) or Bavistin (Carbendazim)",
-            "organic_treatment": "Spray Dashparni Ark or Neem oil",
-            "dosage": "2ml per liter, apply twice before flowering",
-            "recommendations": [
-                "Prune dead twigs and burn them",
-                "Maintain orchard sanitation",
-                "Avoid injury to fruits during harvest"
-            ]
-        }
-    ],
-    "cucumber": [
-        {
-            "name": "Powdery Mildew",
-            "scientific_name": "Podosphaera xanthii",
-            "cause": "Fungal infection favored by warm, dry days and cool, humid nights",
-            "symptoms": ["White flour-like powder on leaves and stems", "Leaves turning yellow and then brown", "Stunted fruit growth"],
-            "severity_indicators": ["spot_density", "leaf_coverage"],
-            "chemical_treatment": "Karathane (Dinocap) or Bayleton (Triadimefon)",
-            "organic_treatment": "Milk spray (1:9 ratio) or Neem oil",
-            "dosage": "5ml per liter, spray every 7 days",
-            "recommendations": [
-                "Increase air circulation",
-                "Reduce shade",
-                "Apply sulfur-based fungicides",
-                "Remove and burn heavily infected leaves"
-            ]
-        },
-        {
-            "name": "Downy Mildew",
-            "scientific_name": "Pseudoperonospora cubensis",
-            "symptoms": ["Angular yellow spots on upper leaf surface", "Purplish-gray fungus on leaf undersides"],
-            "severity_indicators": ["angular_spot_count", "underside_growth"],
-            "chemical_treatment": "Ridomil Gold or Curzate",
-            "organic_treatment": "Copper fungicides",
-            "dosage": "2g per liter, apply upon first sign",
-            "recommendations": [
-                "Avoid overhead irrigation",
-                "Improve plant spacing",
-                "Monitor humidity levels"
-            ]
-        }
-    ],
-    "pepper": [
-        {
-            "name": "Bacterial Spot",
-            "scientific_name": "Xanthomonas campestris pv. vesicatoria",
-            "symptoms": ["Small yellow-green lesions", "Angular spots on leaves", "Pustules on leaf undersides"],
-            "severity_indicators": ["spot_density", "lesion_size"],
-            "chemical_treatment": "Copper-based fungicides or Streptomycin",
-            "organic_treatment": "Neem oil or Serenade (Bacillus subtilis)",
-            "dosage": "2.5g per liter, spray every 10-14 days",
-            "recommendations": [
-                "Using pathogen-free seeds",
-                "Remove and burn infected plant debris",
-                "Rotate with non-host crops like corn"
-            ]
-        },
-        {
-            "name": "Healthy",
-            "scientific_name": "N/A",
-            "symptoms": ["Green leaves", "No spots", "Upright growth"],
-            "recommendations": ["Normal maintenance", "Observe for pests"]
-        }
-    ],
-    "potato": [
-        {
-            "name": "Late Blight",
-            "scientific_name": "Phytophthora infestans",
-            "symptoms": ["Dark water-soaked lesions", "White mold on undersides", "Tuber rot"],
-            "severity_indicators": ["lesion_coverage", "tuber_damage"],
-            "chemical_treatment": "Ridomil Gold or Indofil M-45 (Mancozeb)",
-            "organic_treatment": "Copper oxychloride",
-            "dosage": "3g per liter, preventive spray recommended",
-            "recommendations": [
-                "Apply protective fungicides",
-                "Destroy infected plants",
-                "Harvest early if disease is severe",
-                "Store only healthy tubers"
-            ]
-        },
-        {
-            "name": "Early Blight",
-            "scientific_name": "Alternaria solani",
-            "symptoms": ["Target-like spots with concentric rings", "Leaf yellowing"],
-            "severity_indicators": ["spot_count", "leaf_yellowing"],
-            "chemical_treatment": "Chlorothalonil or Azoxystrobin",
-            "organic_treatment": "Neem oil",
-            "dosage": "2ml per liter",
-            "recommendations": [
-                "Rotate with non-solanaceous crops",
-                "Maintain plant vigor with balanced nutrition"
-            ]
-        },
-        {
-            "name": "Healthy",
-            "scientific_name": "N/A",
-            "symptoms": ["Lush green foliage", "No lesions"],
-            "recommendations": ["Normal irrigation", "Hill up tubers"]
-        }
-    ],
-    "tomato": [
-        {
-            "name": "Early Blight",
-            "scientific_name": "Alternaria solani",
-            "symptoms": ["Dark brown spots with concentric rings", "Yellowing around lesions", "Leaf curling"],
-            "severity_indicators": ["spot_size", "leaf_coverage", "yellowing"],
-            "chemical_treatment": "Amistar (Azoxystrobin) or Kavach (Chlorothalonil)",
-            "organic_treatment": "Neem oil or Baking soda solution (5g/L)",
-            "dosage": "2ml per liter of water, spray every 10 days",
-            "recommendations": [
-                "Remove affected leaves immediately",
-                "Apply fungicide containing chlorothalonil or azoxystrobin",
-                "Improve air circulation around plants",
-                "Avoid overhead watering"
-            ]
-        },
-        {
-            "name": "Late Blight",
-            "scientific_name": "Phytophthora infestans",
-            "symptoms": ["Water-soaked lesions", "White fungal growth on leaf undersides", "Rapid spreading"],
-            "severity_indicators": ["lesion_size", "spread_rate", "fungal_growth"],
-            "chemical_treatment": "Ridomil Gold (Metalaxyl + Mancozeb)",
-            "organic_treatment": "Copper-based fungicides (Bordeaux mixture)",
-            "dosage": "2.5g per liter, spray immediately upon detection",
-            "recommendations": [
-                "Apply copper-based fungicides immediately",
-                "Remove and destroy infected plants",
-                "Ensure proper spacing for air circulation",
-                "Monitor weather conditions closely"
-            ]
-        },
-        {
-            "name": "Leaf Mold",
-            "scientific_name": "Passalora fulva",
-            "symptoms": ["Pale green or yellow spots on upper leaves", "Olive-green to brown velvety coating underneath"],
-            "severity_indicators": ["spot_density", "coating_coverage"],
-            "chemical_treatment": "Score (Difenoconazole)",
-            "organic_treatment": "Sulfur dust or biological controls (Bacillus subtilis)",
-            "dosage": "1ml per liter, apply every 14 days",
-            "recommendations": [
-                "Reduce humidity in growing area",
-                "Improve ventilation",
-                "Apply fungicides if severe",
-                "Remove heavily infected leaves"
-            ]
-        },
-        {
-            "name": "Bacterial Spot",
-            "scientific_name": "Xanthomonas perforans",
-            "symptoms": ["Small, water-soaked spots", "Spots turning black with yellow halo"],
-            "severity_indicators": ["spot_count", "blackening"],
-            "chemical_treatment": "Copper/Mancozeb mix",
-            "organic_treatment": "Neem spray",
-            "dosage": "2g per liter",
-            "recommendations": ["Avoid touching plants when wet", "Use drip irrigation"]
-        },
-        {
-            "name": "Fungal Spot",
-            "scientific_name": "Septoria lycopersici",
-            "symptoms": ["Small circular spots with dark borders", "White or gray centers"],
-            "severity_indicators": ["spot_density"],
-            "chemical_treatment": "Chlorothalonil",
-            "organic_treatment": "Remove lower leaves",
-            "dosage": "2ml per liter",
-            "recommendations": ["Mulch to prevent soil splash", "Aerate the soil"]
-        },
-        {
-            "name": "Leaf Spot",
-            "scientific_name": "Stemphylium solani",
-            "symptoms": ["Small brownish-black spots", "Centers may drop out"],
-            "severity_indicators": ["hole_count"],
-            "chemical_treatment": "Mancozeb",
-            "organic_treatment": "Neem oil",
-            "dosage": "3g per liter",
-            "recommendations": ["Remove infected debris", "Increase spacing"]
-        },
-        {
-            "name": "Mite Damage",
-            "scientific_name": "Tetranychus urticae",
-            "symptoms": ["Yellow stippling on leaves", "Fine webbing on undersides"],
-            "severity_indicators": ["webbing_abundance", "stipple_density"],
-            "chemical_treatment": "Abamectin or Spiromesifen",
-            "organic_treatment": "Insecticidal soap",
-            "dosage": "0.5ml per liter",
-            "recommendations": ["Wash plants with water", "Introduce predatory mites"]
-        },
-        {
-            "name": "Viral Mosaic",
-            "scientific_name": "Tobacco Mosaic Virus (TMV)",
-            "symptoms": ["Mottling and mosaic patterns", "Stunted growth", "Malformed fruit"],
-            "severity_indicators": ["stunting_degree", "mottle_coverage"],
-            "chemical_treatment": "None (Viral disease)",
-            "organic_treatment": "Remove and burn plant",
-            "dosage": "N/A",
-            "recommendations": ["Wash hands before touching plants", "Control aphids/vectors"]
-        },
-        {
-            "name": "Healthy",
-            "scientific_name": "N/A",
-            "symptoms": ["Dark green leaves", "Robust stems"],
-            "recommendations": ["Monitor for pests", "Prune suckers"]
-        }
-    ]
-}
+from app.data.disease_data import DISEASE_DATABASE
 
 
 # Translation Dictionary
@@ -408,6 +80,9 @@ TRANSLATION_DATABASE = {
         "Leaf Spot": "पत्ता धब्बा",
         "Mite Damage": "माइट का प्रकोप",
         "Viral Mosaic": "मोजेक वायरस",
+        "Fusarium Wilt": "फ्यूसेरियम विल्ट (मुरझाना)",
+        "Anthracnose": "एंथ्रेकनोज (Anthracnose)",
+        "Mosaic Virus": "मोजेक वायरस",
         "Healthy": "स्वस्थ"
     },
     "mr": {
@@ -483,7 +158,7 @@ class AIPlantAnalyzer:
     Uses AgriInferenceV5 for ML results with deterministic mock fallback.
     """
     def __init__(self):
-        self.v5_engine = None
+        self.v7_engine = None
         self._load_model()
         self.env_risk_service = EnvironmentalRiskService()
         self.soil_analysis_service = SoilAnalysisService()
@@ -492,24 +167,22 @@ class AIPlantAnalyzer:
         
     def _load_model(self):
         """Attempts to load the ML engine if the model file is present."""
-        if self.v5_engine:
+        if self.v7_engine:
             return True
             
         try:
-            from app.ml.v5.inference_v5 import AgriInferenceV5
-            # Path relative to backend/ app
-            model_path = os.path.join("app", "ml", "v5", "agrinet_v5_best.pth")
+            from app.ml.v7.inference_v7 import AgriInferenceV7
+            # Path for V7 Keras model
+            model_path = os.path.join("app", "ml", "v7", "plant_disease_prediction_model.h5")
             if os.path.exists(model_path):
-                import torch
-                device = "cuda" if torch.cuda.is_available() else "cpu"
-                self.v5_engine = AgriInferenceV5(
+                self.v7_engine = AgriInferenceV7(
                     model_path=model_path,
-                    device=device
+                    device="cpu"
                 )
-                print(f"V5 ML Engine loaded successfully on {device}.")
+                print(f"V7 Keras Engine loaded successfully.")
                 return True
         except Exception as e:
-            print(f"V5 ML Engine loading failed: {e}")
+            print(f"V7 ML Engine loading failed: {e}")
         return False
         
         self.env_risk_service = EnvironmentalRiskService()
@@ -544,20 +217,36 @@ class AIPlantAnalyzer:
         nparr = np.frombuffer(image_data, np.uint8)
         img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        # 1. Image-based Analysis (v5) - try to load if not present
-        if not self.v5_engine:
-            self._load_model()
-        v5_result = None
-        if self.v5_engine and img_bgr is not None:
+        # 1. Image-based Analysis (High-Precision Modular Orchestrator)
+        v7_result = None
+        if image_data:
             try:
-                img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-                v5_result = self.v5_engine.predict(img_rgb)
+                # Use the specialized DiseaseDetectionAgent for multi-model switching
+                from app.agents.disease_agent import DiseaseDetectionAgent
+                diag_agent = DiseaseDetectionAgent()
+                
+                # Execute diagnosis with crop context
+                diag_result = diag_agent.execute({
+                    "image": image_data,
+                    "crop_name": crop_name,
+                    "weather_context": weather,
+                    "growth_stage": growth_stage
+                })
+                
+                # Map agent result back to v7_result format for backward compatibility
+                v7_result = {
+                    "disease_name": diag_result["disease_name"],
+                    "confidence": diag_result["confidence"],
+                    "severity": 0.8 if diag_result["severity"] == "High" else 0.4,
+                    "status": "Success" if diag_result["confidence"] > 0.4 else "Uncertain"
+                }
+                print(f"DEBUG: Specialized Analysis Success. Result: {v7_result['disease_name']} ({v7_result['confidence']})")
             except Exception as e:
-                print(f"V5 Inference Error: {e}")
+                print(f"Specialized Inference Error: {e}")
 
         # 1b. Fallback "White Spot" detection if model is not trained/present
         white_spot_detected = False
-        if (not self.v5_engine or (v5_result and v5_result["status"] == "Uncertain")) and img_bgr is not None:
+        if (not self.v7_engine or (v7_result and v7_result.get("status") == "Uncertain")) and img_bgr is not None:
             try:
                 # Simple rule-based "White Spot" detection for Powdery Mildew
                 gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
@@ -600,18 +289,18 @@ class AIPlantAnalyzer:
         img_hash = hashlib.md5(image_data).hexdigest()
         hash_int = int(img_hash, 16)
         
-        if v5_result:
+        if v7_result:
             # Handle Uncertainty logic from requirements
-            if v5_result["status"] == "Uncertain":
+            if v7_result.get("status") == "Uncertain":
                 # Requirement: If symptoms detected but classification uncertain, 
                 # classify as "Potential Disease – Further Analysis Required"
                 return {
                     "disease_name": "Potential Disease – Further Analysis Required",
                     "scientific_name": "N/A",
-                    "confidence": v5_result["confidence"],
+                    "confidence": v7_result["confidence"],
                     "severity": "Unknown",
                     "symptoms_detected": ["Awaiting clearer image for spot analysis"],
-                    "analysis": v5_result["message"],
+                    "analysis": v7_result.get("message", "Classification uncertain."),
                     "recommendations": [
                         "Please capture a clearer, high-resolution image",
                         "Ensure lesions are in focus",
@@ -627,7 +316,7 @@ class AIPlantAnalyzer:
                 }
 
             # Match v5 result to local database
-            mapped_disease_name = v5_result["prediction"]
+            mapped_disease_name = v7_result["disease_name"]
             
             # Find matching disease in DB by name
             selected_disease = next((d for d in crop_diseases if d["name"].lower() == mapped_disease_name.lower()), None)
@@ -636,13 +325,13 @@ class AIPlantAnalyzer:
                 # Fallback to generic if name doesn't exist in DB
                 selected_disease = {
                     "name": mapped_disease_name,
-                    "scientific_name": "Detected via AgriNet-V5",
+                    "scientific_name": "Detected via AgriNet-V7",
                     "symptoms": ["Anomalies detected in imagery"],
                     "recommendations": ["Consult local guidelines for " + mapped_disease_name]
                 }
 
-            confidence = v5_result["confidence"]
-            severity_val = v5_result["severity"] * 100
+            confidence = v7_result["confidence"]
+            severity_val = v7_result["severity"] * 100
         else:
             if not crop_diseases:
                 response = self._generic_disease_response(crop_name)
@@ -720,7 +409,7 @@ class AIPlantAnalyzer:
                 "name": crop_name,
                 "growth_stage": growth_stage or "Unknown",
                 "region": region or "Unknown",
-                "ml_detected_crop": v5_result.get("prediction") if v5_result else "Mocked"
+                "ml_detected_crop": v7_result.get("disease_name") if v7_result else "Mocked"
             },
             "environmental_risk": env_risk,
             "soil_analysis": soil_result,

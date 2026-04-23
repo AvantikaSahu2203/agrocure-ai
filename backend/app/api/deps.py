@@ -46,6 +46,24 @@ def get_current_user(
 def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
-    if not crud.user.is_active(current_user):
+    if not getattr(current_user, 'is_active', True):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+def get_current_active_user_optional(
+    db: Session = Depends(get_db), 
+    token: Optional[str] = Depends(reusable_oauth2)
+) -> Optional[models.User]:
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = schemas.TokenPayload(**payload)
+        user = crud.user.get(db, id=token_data.sub)
+        if user and getattr(user, 'is_active', True):
+            return user
+    except Exception:
+        pass
+    return None

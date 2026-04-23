@@ -1,8 +1,9 @@
-from typing import Optional
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from typing import Optional, Any
+from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 from app.services.ai_analyzer import ai_analyzer
+from app.api import deps
 
 router = APIRouter()
 
@@ -20,7 +21,8 @@ async def analyze_disease(
     soil_n: Optional[float] = Form(None, description="Soil Nitrogen"),
     soil_p: Optional[float] = Form(None, description="Soil Phosphorus"),
     soil_k: Optional[float] = Form(None, description="Soil Potassium"),
-    language: str = Form("en", description="Language code (en, hi, mr)")
+    language: str = Form("en", description="Language code (en, hi, mr)"),
+    current_user: Any = Depends(deps.get_current_active_user)
 ):
     """
     Analyze crop image for disease detection.

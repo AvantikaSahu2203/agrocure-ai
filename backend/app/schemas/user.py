@@ -4,15 +4,22 @@ from app.models.status_enums import UserRole
 
 # Shared properties
 class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     role: Optional[UserRole] = UserRole.FARMER
     full_name: Optional[str] = None
     phone_number: Optional[str] = None
     is_active: Optional[bool] = True
+    is_verified: Optional[bool] = False
+    verification_code: Optional[str] = None
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
-    email: EmailStr
+    email: str
+    password: str
+
+# Schema for JSON Login
+class UserLogin(BaseModel):
+    username: str
     password: str
 
 # Properties to receive via API on update

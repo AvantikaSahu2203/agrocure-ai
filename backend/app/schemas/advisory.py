@@ -1,18 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 
-class SoilData(BaseModel):
-    soil_type: Optional[str] = None
-    n: Optional[float] = None
-    p: Optional[float] = None
-    k: Optional[float] = None
-
 class AdvisoryRequest(BaseModel):
     lat: float
     lon: float
     crop_name: str
     growth_stage: str # Seedling, Vegetative, Flowering, Harvest
-    soil_data: Optional[SoilData] = None
 
 class WeatherAdvice(BaseModel):
     summary: str

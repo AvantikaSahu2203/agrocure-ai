@@ -40,17 +40,25 @@ class EnvironmentalRiskService:
             response.raise_for_status()
             data = response.json()
             
-            # Extract current values
+            # Extract current values with robust fallbacks for None/Null
             current = data.get("current_weather", {})
             hourly = data.get("hourly", {})
             
-            # Get latest values from hourly data
-            latest_idx = -1
+            # Helper to get value or default
+            def get_val(container, key, default):
+                val = container.get(key)
+                return val if val is not None else default
+
+            # Get latest values from hourly data safely
+            def get_latest(container, key, default):
+                series = container.get(key, [])
+                return series[-1] if series and len(series) > 0 else default
+
             features = {
-                "temperature": current.get("temperature", 25.0),
-                "humidity": hourly.get("relative_humidity_2m", [60.0])[latest_idx],
-                "rainfall": hourly.get("precipitation", [0.0])[latest_idx],
-                "soil_moisture": hourly.get("soil_moisture_0_to_1cm", [0.3])[latest_idx]
+                "temperature": get_val(current, "temperature", 25.0),
+                "humidity": get_latest(hourly, "relative_humidity_2m", 60.0),
+                "rainfall": get_latest(hourly, "precipitation", 0.0),
+                "soil_moisture": get_latest(hourly, "soil_moisture_0_to_1cm", 0.3)
             }
             return features
         except Exception as e:

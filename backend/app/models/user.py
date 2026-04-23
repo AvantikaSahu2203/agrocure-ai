@@ -16,6 +16,8 @@ class User(Base):
     full_name = Column(String, nullable=True)
     phone_number = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    verification_code = Column(String, nullable=True)
     
     # Location data (simplified for now, ideally use PostGIS)
     latitude = Column(Float, nullable=True)
