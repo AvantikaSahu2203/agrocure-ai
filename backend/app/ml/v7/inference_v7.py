@@ -52,6 +52,7 @@ class AgriInferenceV7:
     def predict(self, image_bytes: bytes, crop_name: str = None):
         """
         Takes image bytes and returns detailed prediction using the Keras model.
+        Supports crop-aware filtering to eliminate cross-crop misclassification.
         """
         if self.model is None:
             raise RuntimeError("Model not loaded")
@@ -62,23 +63,44 @@ class AgriInferenceV7:
             img = img.convert('RGB')
         img = img.resize((224, 224))
         
-        # 2. Convert to Array (Normalize to [0,1] for standard Keras/TensorFlow pipelines)
+        # 2. Convert to Array (Normalize to [0,1])
         input_arr = np.array(img).astype(np.float32) / 255.0
         input_arr = np.expand_dims(input_arr, axis=0) # (1, 224, 224, 3)
         
         # 3. Inference
-        predictions = self.model.predict(input_arr)
-        result_index = np.argmax(predictions[0])
-        confidence = float(np.max(predictions[0]))
+        predictions = self.model.predict(input_arr)[0] # Get probabilities for first batch
         
-        # 4. Result Construction
-        diagnosis = self.class_names[result_index]
+        # 4. Crop-Aware Filtering (Objective: Fix cross-crop errors)
+        final_index = np.argmax(predictions)
         
-        # Heuristic severity calculation for Keras (based on confidence)
+        if crop_name and crop_name.lower() != "general":
+            target = crop_name.lower()
+            # Map "corn" to "maize" for label matching
+            if target == "corn": target = "maize"
+            
+            # Find indices that match the requested crop
+            valid_indices = [i for i, name in enumerate(self.class_names) if target in name.lower()]
+            
+            if valid_indices:
+                # Suppress (zero out) all classes that don't belong to the selected crop
+                filtered_probs = np.zeros_like(predictions)
+                for idx in valid_indices:
+                    filtered_probs[idx] = predictions[idx]
+                
+                # Re-calculate argmax from filtered set
+                final_index = np.argmax(filtered_probs)
+                print(f"DEBUG: V7 Filtering active for {crop_name}. Original max: {self.class_names[np.argmax(predictions)]} -> Filtered max: {self.class_names[final_index]}")
+            else:
+                print(f"DEBUG: V7 No labels found for crop '{crop_name}'. Using global argmax.")
+
+        confidence = float(predictions[final_index])
+        diagnosis = self.class_names[final_index]
+        
+        # Heuristic severity calculation
         severity_score = confidence if "Healthy" not in diagnosis else 0.05
         
         # Create probability map
-        prob_map = {self.class_names[i]: float(predictions[0][i]) for i in range(len(self.class_names))}
+        prob_map = {self.class_names[i]: float(predictions[i]) for i in range(len(self.class_names))}
         
         return {
             "disease_name": diagnosis,
@@ -86,5 +108,5 @@ class AgriInferenceV7:
             "probabilities": prob_map,
             "severity": severity_score,
             "is_v7": True,
-            "model_type": "keras_38_class"
+            "model_type": "keras_38_class_filtered"
         }

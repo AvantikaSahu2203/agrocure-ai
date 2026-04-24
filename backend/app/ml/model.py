@@ -37,6 +37,11 @@ try:
 except ImportError:
     WatermelonInference = None
 
+try:
+    from .maize.maize_inference import MaizeInference
+except ImportError:
+    MaizeInference = None
+
 class DiseaseModel:
     def __init__(self, model_path: str = "app/ml/plant_disease_model.h5"):
         self.model_path = model_path
@@ -48,7 +53,9 @@ class DiseaseModel:
         self.brinjal_engine = None
         self.rice_engine = None
         self.watermelon_engine = None
+        self.maize_engine = None
         self.is_loaded = False
+
         
         # 0. Attempt V7 (Keras 38-class) Initialization
         if AgriInferenceV7 and os.path.exists(self.v7_weights):
@@ -69,6 +76,10 @@ class DiseaseModel:
 
         if WatermelonInference:
             self.watermelon_engine = WatermelonInference()
+
+        if MaizeInference:
+            self.maize_engine = MaizeInference()
+
 
         # ... (rest of the init remains same)
         
@@ -146,7 +157,7 @@ class DiseaseModel:
             except Exception as e:
                 logging.error(f"Rice Prediction error: {e}")
 
-        if "watermelon" in crop_lower and self.watermelon_engine:
+        if ("watermelon" in crop_lower) and self.watermelon_engine:
             try:
                 res = self.watermelon_engine.predict(image_bytes)
                 return {
@@ -157,6 +168,19 @@ class DiseaseModel:
                 }
             except Exception as e:
                 logging.error(f"Watermelon Prediction error: {e}")
+
+        if ("maize" in crop_lower or "corn" in crop_lower) and self.maize_engine:
+            try:
+                res = self.maize_engine.predict(image_bytes)
+                return {
+                    "disease_name": res["disease_name"],
+                    "confidence": res["confidence"],
+                    "severity": res.get("severity", 0.8),
+                    "is_specialized": True
+                }
+            except Exception as e:
+                logging.error(f"Maize Prediction error: {e}")
+
 
         # 3. V7 Ensemble (Fallback only for standard PlantVillage crops)
         plant_village_crops = ["apple", "cherry", "corn", "grape", "orange", "peach", "pepper", "potato", "raspberry", "soybean", "squash", "strawberry", "tomato"]

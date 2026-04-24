@@ -82,6 +82,7 @@ class DiseaseDetectionAgent(BaseAgent):
             }
 
         # 2. Run standard ML Prediction (v6/v7 optimized)
+        # Pass crop_name to enable crop-aware softmax filtering in v7 engine
         prediction = disease_model.predict(image_data, crop_name)
         disease_name = prediction["disease_name"]
         confidence = prediction["confidence"]
