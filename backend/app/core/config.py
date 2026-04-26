@@ -16,7 +16,7 @@ class Settings:
     
     SECRET_KEY: str = os.getenv("SECRET_KEY", "7b9e8c1d2e3f4a5b6c7d8e9f0a1b2c3d") 
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
     
     # External APIs
     FIREBASE_SERVICE_ACCOUNT_PATH: str = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH", "app/core/serviceAccountKey.json")
@@ -27,6 +27,6 @@ class Settings:
     # Supabase Storage Configuration
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
-    SUPABASE_BUCKET: str = os.getenv("SUPABASE_BUCKET", "crop-scans")
+    SUPABASE_BUCKET: str = os.getenv("SUPABASE_BUCKET", "diagnosis")
 
 settings = Settings()

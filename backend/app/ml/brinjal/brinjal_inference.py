@@ -13,33 +13,19 @@ class BrinjalInference:
     Architecture defined in-code to avoid Keras 3 deserialization bugs.
     """
     def __init__(self):
-        # Use the clean re-baked model (avoids Keras 3 dense-layer deserialization bug)
-        # Prioritize the user-trained model (Look in root or local folder)
-        self.model_path = os.path.join(os.getcwd(), "brinjal_disease_model_user.keras")
+        # Manual Weights Path (Extracted from user ZIP)
+        self.weights_path = r"c:\Users\ASUS\Desktop\mobileapp\brinjal_extracted\model.weights.h5"
+        self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
         
-        # Fallback to internal app path if not found in root
-        if not os.path.exists(self.model_path):
-             self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
-        
-        # Fallback to clean or original
-        if not os.path.exists(self.model_path):
-            self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_user_clean.keras")
-        if not os.path.exists(self.model_path):
-            self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
         self.model = None
         
-        # EXACT class names and sequence from Untitled21 (1).ipynb (Cell 40)
+        # EXACT class names from training (7 classes)
         self.class_names = [
-            "anthracnose",
-            "bacterial_wilt",
-            "brinjal_healthy",
-            "little_leaf",
-            "phomopsis_blight",
-            "powdery_mildew",
-            "verticillium_wilt"
+            "anthracnose", "bacterial_wilt", "brinjal_healthy", 
+            "little_leaf", "phomopsis_blight", "powdery_mildew", "verticillium_wilt"
         ]
         
-        # Knowledge base for Brinjal diseases (Updated with user's supported classes)
+        # Knowledge base for Brinjal diseases
         self.disease_details = {
             "anthracnose": {
                 "scientific_name": "Colletotrichum gleosporioides",
@@ -52,7 +38,7 @@ class BrinjalInference:
                 "recommendations": ["Ensure proper drainage", "Rotate with non-solanaceous crops", "Use resistant varieties"]
             },
             "brinjal_healthy": {
-                "scientific_name": "N/A",
+                "scientific_name": "Solanum melongena",
                 "symptoms": ["Green, vibrant leaves", "No visible lesions"],
                 "recommendations": ["Continue regular maintenance", "Apply balanced NPK fertilizer"]
             },
@@ -79,20 +65,18 @@ class BrinjalInference:
         }
 
     def _build_architecture(self):
-        """Rebuild the exact architecture from train_user_brinjal.py"""
+        """Rebuild the exact architecture from training."""
         inputs = keras.Input(shape=(224, 224, 3))
         base_model = keras.applications.MobileNetV2(
             input_shape=(224, 224, 3),
             include_top=False,
             weights=None
         )
-        base_model.trainable = True
-        
         x = base_model(inputs)
         x = keras.layers.GlobalAveragePooling2D()(x)
         x = keras.layers.Dense(128, activation='relu')(x)
         x = keras.layers.Dropout(0.5)(x)
-        outputs = keras.layers.Dense(7, activation='softmax')(x)
+        outputs = keras.layers.Dense(len(self.class_names), activation='softmax')(x)
         
         model = keras.Model(inputs, outputs)
         return model
@@ -100,32 +84,27 @@ class BrinjalInference:
     def _load_model(self):
         if self.model is not None:
             return True
+            
         try:
-            # Keras 3 direct loading for .keras files
+            # 1. Try Keras 3 direct loading
             if os.path.exists(self.model_path):
                 self.model = keras.models.load_model(self.model_path, compile=False)
-                print(f"[BrinjalInference] Keras 3 model loaded from {self.model_path}")
                 return True
-            else:
-                # Fallback to the other path if user-specific model is not found
-                original_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
-                if os.path.exists(original_path):
-                    self.model = keras.models.load_model(original_path, compile=False)
-                    print(f"[BrinjalInference] Standard model loaded from {original_path}")
-                    return True
-                return False
         except Exception as e:
-            print(f"[BrinjalInference] Failed to load model: {e}")
-            # Final fallback: Rebuild architecture and try loading weights
-            try:
-                print("[BrinjalInference] Attempting manual architecture reconstruction...")
+            print(f"[BrinjalInference] Direct load failed: {e}")
+
+        try:
+            # 2. Rebuild architecture and load weights (Guaranteed Fallback)
+            if os.path.exists(self.weights_path):
+                print(f"[BrinjalInference] Rebuilding architecture and loading weights from {self.weights_path}")
                 self.model = self._build_architecture()
-                if os.path.exists(self.model_path):
-                     self.model.load_weights(self.model_path)
+                self.model.load_weights(self.weights_path)
                 return True
-            except Exception as e2:
-                print(f"[BrinjalInference] Manual reconstruction also failed: {e2}")
+        except Exception as e:
+            print(f"[BrinjalInference] Weights load failed: {e}")
+            
         return False
+
 
 
     def predict(self, image_bytes: bytes):

@@ -75,22 +75,76 @@ class DiseaseDetectionAgent(BaseAgent):
         if "maize" in crop_name or "corn" in crop_name:
             print(f"--- TRIGGERING SPECIALIZED MAIZE MODEL (Isolated Pipeline) ---")
             maize_res = self.maize_specialized_model.predict(image_data)
-            return {
-                **maize_res,
-                "affected_area_percentage": maize_res.get("affected_area_percentage", random.randint(18, 45)),
-                "detected_at": datetime.utcnow().isoformat()
-            }
+            
+            # Fallback logic: If specialized model is offline, use the standard V7 engine (which supports Corn)
+            if maize_res.get("disease_name") == "Maize Diagnostic Offline":
+                print(f"--- Specialized Maize model is OFFLINE. Falling back to V7 Standard Engine. ---")
+                # Continue to step 2 instead of returning
+            else:
+                return {
+                    **maize_res,
+                    "affected_area_percentage": maize_res.get("affected_area_percentage", random.randint(18, 45)),
+                    "detected_at": datetime.utcnow().isoformat()
+                }
 
         # 2. Run standard ML Prediction (v6/v7 optimized)
         # Pass crop_name to enable crop-aware softmax filtering in v7 engine
         prediction = disease_model.predict(image_data, crop_name)
         disease_name = prediction["disease_name"]
         confidence = prediction["confidence"]
-        probabilities = prediction.get("probabilities", {}) # New in v7.1
+        probabilities = prediction.get("probabilities", {}) 
         
         # Capture v6-specific details if available
         v6_severity = prediction.get("severity")
         is_v6 = prediction.get("is_v6", False)
+        
+        # --- SENSELESS IMAGE GUARD (Anti-Human/Object Detection) ---
+        # 1. Color-based Plant Check (Heuristic)
+        try:
+            import cv2
+            import numpy as np
+            nparr = np.frombuffer(image_data, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            
+            # Range for Green (Healthy) and Brown/Yellow (Diseased)
+            lower_green = np.array([25, 30, 30])
+            upper_green = np.array([90, 255, 255])
+            lower_brown = np.array([10, 30, 20])
+            upper_brown = np.array([25, 255, 200])
+            
+            mask_green = cv2.inRange(hsv, lower_green, upper_green)
+            mask_brown = cv2.inRange(hsv, lower_brown, upper_brown)
+            plant_pixel_ratio = (cv2.countNonZero(mask_green) + cv2.countNonZero(mask_brown)) / (img.shape[0] * img.shape[1])
+            
+            print(f"DEBUG: Plant Pixel Ratio: {plant_pixel_ratio:.4f}")
+            
+            is_valid_plant = plant_pixel_ratio > 0.04 # At least 4% of pixels must be plant-colored
+        except Exception as e:
+            print(f"DEBUG: Color filter failed: {e}")
+            is_valid_plant = True # Fallback to true if CV2 fails
+
+        if confidence < 0.38 or not is_valid_plant:
+            print(f"--- SENSELESS IMAGE REJECTED (Conf: {confidence:.2f}, PlantRatio: {plant_pixel_ratio if 'plant_pixel_ratio' in locals() else 'N/A'}) ---")
+            return {
+                "disease_name": "Not a Crop / Unclear Image",
+                "scientific_name": "Non-Vegetative Object",
+                "confidence": confidence,
+                "severity": "N/A",
+                "affected_area_percentage": 0,
+                "analysis": "The AI could not identify a valid crop or disease pattern. It appears to be a non-crop object (like a person or tool) or the image is too blurry. Please ensure you are scanning a clear leaf.",
+                "cause": "Invalid subject or low plant-color density",
+                "symptoms": ["No plant-specific features recognized"],
+                "suggestions": [
+                    "Ensure you are scanning a plant leaf",
+                    "Avoid scanning people, hands, or background objects",
+                    "Clean your camera lens",
+                    "Ensure good lighting"
+                ],
+                "color_inference": None,
+                "status": "Rejected",
+                "detected_at": datetime.utcnow().isoformat()
+            }
         
         # 2. Leaf Color Intelligence (Objective 6)
         color_hint = None

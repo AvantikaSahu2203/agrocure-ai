@@ -172,18 +172,20 @@ class DiseaseModel:
         if ("maize" in crop_lower or "corn" in crop_lower) and self.maize_engine:
             try:
                 res = self.maize_engine.predict(image_bytes)
-                return {
-                    "disease_name": res["disease_name"],
-                    "confidence": res["confidence"],
-                    "severity": res.get("severity", 0.8),
-                    "is_specialized": True
-                }
+                # Only return if the model is actually online
+                if res.get("disease_name") != "Maize Diagnostic Offline":
+                    return {
+                        "disease_name": res["disease_name"],
+                        "confidence": res["confidence"],
+                        "severity": res.get("severity", 0.8),
+                        "is_specialized": True
+                    }
             except Exception as e:
                 logging.error(f"Maize Prediction error: {e}")
 
 
         # 3. V7 Ensemble (Fallback only for standard PlantVillage crops)
-        plant_village_crops = ["apple", "cherry", "corn", "grape", "orange", "peach", "pepper", "potato", "raspberry", "soybean", "squash", "strawberry", "tomato"]
+        plant_village_crops = ["apple", "cherry", "corn", "grape", "orange", "peach", "pepper", "potato", "raspberry", "soybean", "squash", "strawberry", "tomato", "cucumber"]
         
         is_pv_crop = any(pv in crop_lower for pv in plant_village_crops)
         

@@ -12,12 +12,13 @@ class WatermelonInference:
     Uses the trained model: watermelon_disease_v1.keras
     """
     def __init__(self):
-        # Look in root directory first (due to GitHub 100MB limit bypass)
-        self.model_path = os.path.join(os.getcwd(), "watermelon_disease_v1.keras")
+        # Use the specific backend directory path
+        self.model_path = os.path.join(os.path.dirname(__file__), "watermelon_disease_v1.keras")
         
-        # Fallback to local ml folder
+        # Fallback to current working directory
         if not os.path.exists(self.model_path):
-            self.model_path = os.path.join(os.path.dirname(__file__), "watermelon_disease_v1.keras")
+            self.model_path = os.path.join(os.getcwd(), "watermelon_disease_v1.keras")
+
         
         self.model = None
         

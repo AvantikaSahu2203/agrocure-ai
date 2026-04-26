@@ -39,7 +39,10 @@ async def upload_image_to_cloud(image_bytes: bytes, filename: str = None) -> str
             logger.info(f"Image uploaded to cloud: {url}")
             return url
         except Exception as e:
-            logger.error(f"Cloud upload failed: {e}")
+            if "Bucket not found" in str(e):
+                logger.error(f"SUPABASE ERROR: Bucket '{bucket}' not found. Please create it in your Supabase project.")
+            else:
+                logger.error(f"Cloud upload failed: {e}")
             # Fallback to local-style naming for the DB record
             return f"uploads/{filename}"
     

@@ -75,8 +75,9 @@ class AgriInferenceV7:
         
         if crop_name and crop_name.lower() != "general":
             target = crop_name.lower()
-            # Map "corn" to "maize" for label matching
+            # Map crops to V7 supported categories
             if target == "corn": target = "maize"
+            if target == "cucumber": target = "squash"
             
             # Find indices that match the requested crop
             valid_indices = [i for i, name in enumerate(self.class_names) if target in name.lower()]

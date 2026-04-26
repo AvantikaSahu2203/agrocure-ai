@@ -11,7 +11,15 @@ class MaizeInference:
     Uses a high-accuracy EfficientNetB0 model.
     """
     def __init__(self):
-        self.model_path = os.path.join(os.path.dirname(__file__), "maize_disease_v1.keras")
+        # Multiple possible paths for the model
+        self.possible_paths = [
+            os.path.join(os.getcwd(), "maize_disease_v1.keras"),
+            os.path.join(os.getcwd(), "maize_disease_pro.keras"),
+            os.path.join(os.path.dirname(__file__), "maize_disease_v1.keras"),
+            os.path.join(os.path.dirname(__file__), "maize_disease_pro.keras"),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "maize_disease_v1.keras")
+        ]
+        self.model_path = None
         self.model = None
         
         # EXACT class names matching the training order
@@ -37,24 +45,34 @@ class MaizeInference:
     def _load_model(self):
         if self.model is not None:
             return True
-        try:
-            if os.path.exists(self.model_path):
-                # Using Keras 3 direct load for modern .keras format
-                self.model = keras.models.load_model(self.model_path, compile=False)
-                print(f"[MaizeInference] High-accuracy model loaded from {self.model_path}")
-                return True
-            else:
-                print(f"[MaizeInference] Model not found at {self.model_path}")
-        except Exception as e:
-            print(f"[MaizeInference] Failed to load model: {e}")
+            
+        # Try each possible path
+        for path in self.possible_paths:
+            if os.path.exists(path):
+                try:
+                    # Using Keras 3 direct load for modern .keras format
+                    self.model = keras.models.load_model(path, compile=False)
+                    self.model_path = path
+                    print(f"[MaizeInference] Specialized model found and loaded from {path}")
+                    return True
+                except Exception as e:
+                    print(f"[MaizeInference] Attempted load from {path} failed: {e}")
+        
+        print(f"[MaizeInference] Specialized Maize model not found. Using 'Diagnostic Offline' status.")
         return False
 
     def predict(self, image_bytes: bytes):
         """
         Runs independent inference using the Maize EfficientNetB0 model.
+        Falls back to V7 if model not found.
         """
         if not self._load_model():
-            return self._mock_predict()
+            # Return a special status that the Agent can recognize to trigger V7
+            return {
+                "disease_name": "Maize Diagnostic Offline",
+                "is_maize_specialized": True,
+                "status": "Incomplete"
+            }
 
         try:
             # 1. Image Pre-processing (Matching training parameters)

@@ -6,6 +6,7 @@ class AdvisoryRequest(BaseModel):
     lon: float
     crop_name: str
     growth_stage: str # Seedling, Vegetative, Flowering, Harvest
+    language: Optional[str] = "en"
 
 class WeatherAdvice(BaseModel):
     summary: str
