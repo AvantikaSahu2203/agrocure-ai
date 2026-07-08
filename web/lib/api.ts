@@ -3,9 +3,15 @@ import axios from 'axios';
 const getBaseURL = () => {
     if (typeof window !== 'undefined') {
         const hostname = window.location.hostname;
-        return `http://${hostname}:5000/api/v1`;
+        const port = window.location.port;
+        // If we are developing locally, use port 5000. Under production Nginx, routing is handled on port 80.
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || port === '3000') {
+            return `http://${hostname}:5000/api/v1`;
+        }
+        // In production, Nginx proxies API calls under /api/v1 (port 80)
+        return `http://${hostname}/api/v1`;
     }
-    return process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5:5000/api/v1';
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 };
 
 const api = axios.create({
