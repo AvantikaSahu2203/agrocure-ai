@@ -22,11 +22,8 @@ RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application ZIP and extract it 
-# This handles the "app" folder correctly in Cloud environments
-# Note: we allow exit code 1 from unzip to handle Windows backslash warnings
-COPY app.zip .
-RUN unzip -q app.zip || [ $? -eq 1 ] && rm app.zip
+# Copy the application folder
+COPY app/ ./app/
 
 # Copy other root files (like the .pth model)
 COPY . .
