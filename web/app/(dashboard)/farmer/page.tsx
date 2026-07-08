@@ -1,7 +1,6 @@
 'use client'
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
 import {
     Cloud,
     Bell,
@@ -18,11 +17,47 @@ import {
     Sprout,
     Wheat,
     Leaf,
-    Lightbulb
+    Lightbulb,
+    Loader2
 } from "lucide-react"
 import Link from "next/link"
+import api from "@/lib/api"
+
+import { Card, CardContent } from "@/components/ui/card"
+import { useLanguage } from "@/context/LanguageContext"
 
 export default function FarmerDashboard() {
+    const { lang, setLang, t } = useLanguage()
+    const [weather, setWeather] = useState<any>(null)
+    const [loadingWeather, setLoadingWeather] = useState(true)
+
+    useEffect(() => {
+        const fetchWeatherAtLocation = async (lat: number, lon: number) => {
+            try {
+                const res = await api.post("/advisory/get-advice", {
+                    lat,
+                    lon,
+                    crop_name: "General",
+                    growth_stage: "Vegetative"
+                })
+                setWeather(res.data.weather)
+            } catch (err) {
+                console.error("Dashboard weather error", err)
+            } finally {
+                setLoadingWeather(false)
+            }
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => fetchWeatherAtLocation(pos.coords.latitude, pos.coords.longitude),
+                () => fetchWeatherAtLocation(18.5204, 73.8567) // Fallback to Pune
+            )
+        } else {
+            fetchWeatherAtLocation(18.5204, 73.8567)
+        }
+    }, [])
+
     return (
         <div className="flex-1 bg-gray-50 min-h-screen pb-20 md:pb-0">
             {/* Custom Header for Mobile/Page View */}
@@ -34,9 +69,12 @@ export default function FarmerDashboard() {
                     <span className="font-bold text-lg text-gray-900">AgroCure AI</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="bg-green-50 px-3 py-1 rounded-full text-green-700 text-sm font-bold border border-green-100">
-                        हिंदी
-                    </div>
+                    <button 
+                        onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                        className="bg-green-50 px-3 py-1 rounded-full text-green-700 text-sm font-bold border border-green-100"
+                    >
+                        {lang === 'en' ? 'EN' : 'HI'}
+                    </button>
                     <div className="bg-gray-100 p-2 rounded-full">
                         <Cloud className="h-5 w-5 text-gray-600" />
                     </div>
@@ -52,8 +90,8 @@ export default function FarmerDashboard() {
                 {/* Hero Section */}
                 <div className="rounded-3xl bg-gradient-to-r from-green-800 to-green-900 p-6 md:p-10 text-white shadow-lg relative overflow-hidden">
                     <div className="relative z-10">
-                        <h1 className="text-2xl md:text-3xl font-bold mb-2">Protect Your Crops with AI</h1>
-                        <p className="text-green-100 text-sm md:text-base opacity-90">Scan, detect, and cure crop diseases instantly</p>
+                        <h1 className="text-2xl md:text-3xl font-bold mb-2">{t('protectCrops')}</h1>
+                        <p className="text-green-100 text-sm md:text-base opacity-90">{t('scanDetectCure')}</p>
                     </div>
                     {/* Decorative circles */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-green-700 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -66,22 +104,32 @@ export default function FarmerDashboard() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between p-5 gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="bg-yellow-100 p-3 rounded-full">
-                                    <Cloud className="h-8 w-8 text-yellow-600 fill-yellow-600" />
+                                    {loadingWeather ? (
+                                        <Loader2 className="h-8 w-8 text-yellow-600 animate-spin" />
+                                    ) : (
+                                        <Cloud className="h-8 w-8 text-yellow-600 fill-yellow-600" />
+                                    )}
                                 </div>
                                 <div>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl font-bold text-gray-900">32°C</span>
-                                        <span className="text-gray-500 font-medium">— Partly Cloudy</span>
+                                        <span className="text-2xl font-bold text-gray-900">
+                                            {loadingWeather ? '--' : `${weather?.temp || 0}`}°C
+                                        </span>
+                                        <span className="text-gray-500 font-medium">— {t('weatherPartlyCloudy')}</span>
                                     </div>
                                     <div className="flex gap-3 text-xs text-gray-400 mt-1">
-                                        <span className="flex items-center gap-1"><Droplets className="h-3 w-3" /> Humidity: 68%</span>
-                                        <span className="flex items-center gap-1"><Wind className="h-3 w-3" /> Wind: 12 km/h</span>
+                                        <span className="flex items-center gap-1">
+                                            <Droplets className="h-3 w-3" /> {t('weatherHumidity')}: {weather?.humidity || '--'}%
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Wind className="h-3 w-3" /> {t('weatherWind')}: 12 km/h
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                             <div className="bg-orange-50 px-4 py-2 rounded-xl border border-orange-100 flex items-center gap-2 self-start md:self-center">
                                 <AlertTriangle className="h-4 w-4 text-orange-600 fill-orange-600" />
-                                <span className="text-orange-700 font-bold text-sm">Fungal Risk</span>
+                                <span className="text-orange-700 font-bold text-sm">{t('fungalRisk')}</span>
                             </div>
                         </div>
                     </CardContent>
@@ -89,7 +137,7 @@ export default function FarmerDashboard() {
 
                 {/* Quick Actions */}
                 <div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">{t('quickActions')}</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {/* Scalable Card: Scan Disease */}
                         <Link href="/farmer/disease-check" className="col-span-1">
@@ -99,8 +147,8 @@ export default function FarmerDashboard() {
                                         <Camera className="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white text-base">Scan Disease</h4>
-                                        <p className="text-green-200 text-xs mt-1">AI-powered detection</p>
+                                        <h4 className="font-bold text-white text-base">{t('scanDisease')}</h4>
+                                        <p className="text-green-200 text-xs mt-1">{t('aiPowered')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -114,8 +162,8 @@ export default function FarmerDashboard() {
                                         <BookOpen className="h-5 w-5 text-blue-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-800 text-base">Disease Library</h4>
-                                        <p className="text-gray-400 text-xs mt-1">Browse all diseases</p>
+                                        <h4 className="font-bold text-gray-800 text-base">{t('diseaseLibrary')}</h4>
+                                        <p className="text-gray-400 text-xs mt-1">{t('browseAll')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -129,8 +177,8 @@ export default function FarmerDashboard() {
                                         <ShoppingCart className="h-5 w-5 text-purple-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-800 text-base">Buy Medicine</h4>
-                                        <p className="text-gray-400 text-xs mt-1">Order online</p>
+                                        <h4 className="font-bold text-gray-800 text-base">{t('buyMedicine')}</h4>
+                                        <p className="text-gray-400 text-xs mt-1">{t('orderOnline')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -144,8 +192,8 @@ export default function FarmerDashboard() {
                                         <MapPin className="h-5 w-5 text-red-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-800 text-base">Nearby Stores</h4>
-                                        <p className="text-gray-400 text-xs mt-1">Find agro shops</p>
+                                        <h4 className="font-bold text-gray-800 text-base">{t('nearbyStores')}</h4>
+                                        <p className="text-gray-400 text-xs mt-1">{t('findAgroShops')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -159,8 +207,8 @@ export default function FarmerDashboard() {
                                         <BarChart3 className="h-5 w-5 text-indigo-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-800 text-base">Crop Reports</h4>
-                                        <p className="text-gray-400 text-xs mt-1">Health analytics</p>
+                                        <h4 className="font-bold text-gray-800 text-base">{t('cropReports')}</h4>
+                                        <p className="text-gray-400 text-xs mt-1">{t('healthAnalytics')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -174,8 +222,8 @@ export default function FarmerDashboard() {
                                         <MessageCircle className="h-5 w-5 text-teal-600" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-800 text-base">Talk to Expert</h4>
-                                        <p className="text-gray-400 text-xs mt-1">Get guidance</p>
+                                        <h4 className="font-bold text-gray-800 text-base">{t('talkToExpert')}</h4>
+                                        <p className="text-gray-400 text-xs mt-1">{t('getGuidance')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -189,8 +237,8 @@ export default function FarmerDashboard() {
                                         <Lightbulb className="h-5 w-5 text-white" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-900 text-base">Smart Advisory</h4>
-                                        <p className="text-indigo-600 font-medium text-[10px] mt-1 uppercase tracking-wider">AI Powered</p>
+                                        <h4 className="font-bold text-gray-900 text-base">{t('smartAdvisory')}</h4>
+                                        <p className="text-indigo-600 font-medium text-[10px] mt-1 uppercase tracking-wider">{t('aiPowered')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -200,7 +248,7 @@ export default function FarmerDashboard() {
 
                 {/* Recent Scans */}
                 <div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Scans</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">{t('recentScans')}</h3>
                     <div className="space-y-3">
                         {/* Item 1 */}
                         <Card className="rounded-2xl border-none shadow-sm hover:bg-gray-50 transition-colors cursor-pointer">
@@ -217,8 +265,8 @@ export default function FarmerDashboard() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">High</span>
-                                    <p className="text-gray-400 text-[10px] mt-1">2 hours ago</p>
+                                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">{t('severityHigh')}</span>
+                                    <p className="text-gray-400 text-[10px] mt-1">2 {t('hoursAgo')}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -236,8 +284,8 @@ export default function FarmerDashboard() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">High</span>
-                                    <p className="text-gray-400 text-[10px] mt-1">Yesterday</p>
+                                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">{t('severityHigh')}</span>
+                                    <p className="text-gray-400 text-[10px] mt-1">{t('yesterdayLocal')}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -255,8 +303,8 @@ export default function FarmerDashboard() {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">None</span>
-                                    <p className="text-gray-400 text-[10px] mt-1">3 days ago</p>
+                                    <span className="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">{t('severityNone')}</span>
+                                    <p className="text-gray-400 text-[10px] mt-1">3 {t('daysAgo')}</p>
                                 </div>
                             </CardContent>
                         </Card>

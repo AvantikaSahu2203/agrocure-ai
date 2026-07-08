@@ -130,6 +130,11 @@ DEFAULT_STAGES = {
         "irrigation": "Ensure steady moisture during bloom.",
         "spray": "Preventive sprays for flower blight."
     },
+    "Fruiting": {
+        "fertilizer": "Apply Potassium-rich fertilizer for fruit quality.",
+        "irrigation": "Maintain consistent moisture; avoid fluctuations.",
+        "spray": "Monitor for fruit flies and borers."
+    },
     "Harvest": {
         "fertilizer": "None.",
         "irrigation": "Reduce watering.",

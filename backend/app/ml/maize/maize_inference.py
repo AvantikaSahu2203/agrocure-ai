@@ -13,10 +13,11 @@ class MaizeInference:
     def __init__(self):
         # Multiple possible paths for the model
         self.possible_paths = [
-            os.path.join(os.getcwd(), "maize_disease_v1.keras"),
-            os.path.join(os.getcwd(), "maize_disease_pro.keras"),
             os.path.join(os.path.dirname(__file__), "maize_disease_v1.keras"),
             os.path.join(os.path.dirname(__file__), "maize_disease_pro.keras"),
+            os.path.join(os.getcwd(), "app", "ml", "maize", "maize_disease_v1.keras"),
+            os.path.join(os.getcwd(), "maize_disease_v1.keras"),
+            os.path.join(os.getcwd(), "maize_disease_pro.keras"),
             os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "maize_disease_v1.keras")
         ]
         self.model_path = None

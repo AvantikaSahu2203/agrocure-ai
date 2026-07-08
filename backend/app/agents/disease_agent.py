@@ -43,49 +43,74 @@ class DiseaseDetectionAgent(BaseAgent):
         
         # 1. Specialized Branch: Rice (Independent Isolation)
         if "rice" in crop_name:
-            print(f"--- TRIGGERING SPECIALIZED RICE MODEL (Isolated Pipeline) ---")
-            rice_res = self.rice_specialized_model.predict(image_data)
-            return {
-                **rice_res,
-                "affected_area_percentage": rice_res.get("affected_area_percentage", random.randint(12, 35)),
-                "detected_at": datetime.utcnow().isoformat()
-            }
+            try:
+                print(f"--- TRIGGERING SPECIALIZED RICE MODEL (Isolated Pipeline) ---")
+                rice_res = self.rice_specialized_model.predict(image_data)
+                return {
+                    **rice_res,
+                    "affected_area_percentage": rice_res.get("affected_area_percentage", random.randint(12, 35)),
+                    "detected_at": datetime.utcnow().isoformat()
+                }
+            except Exception as e:
+                print(f"CRITICAL ERROR in specialized Rice model: {e}")
+                # Fall through to V7
 
         # 1b. Specialized Branch: Brinjal (Independent Isolation)
         if "brinjal" in crop_name:
-            print(f"--- TRIGGERING SPECIALIZED BRINJAL MODEL (Isolated Pipeline) ---")
-            brinjal_res = self.brinjal_specialized_model.predict(image_data)
-            return {
-                **brinjal_res,
-                "affected_area_percentage": brinjal_res.get("affected_area_percentage", random.randint(15, 40)),
-                "detected_at": datetime.utcnow().isoformat()
-            }
+            try:
+                print(f"--- TRIGGERING SPECIALIZED BRINJAL MODEL (Isolated Pipeline) ---")
+                brinjal_res = self.brinjal_specialized_model.predict(image_data)
+                
+                # FALLBACK: If specialized model has an error, use V7 (which supports Brinjal/Eggplant)
+                if brinjal_res.get("disease_name") == "Model Error" or "error" in brinjal_res:
+                    print(f"--- Specialized Brinjal model failed. Falling back to V7 Standard Engine. ---")
+                else:
+                    return {
+                        **brinjal_res,
+                        "affected_area_percentage": brinjal_res.get("affected_area_percentage", random.randint(15, 40)),
+                        "detected_at": datetime.utcnow().isoformat()
+                    }
+            except Exception as e:
+                print(f"CRITICAL ERROR in specialized Brinjal model: {e}")
+                # Fall through to V7
 
         # 1c. Specialized Branch: Watermelon (Independent Isolation)
         if "watermelon" in crop_name:
-            print(f"--- TRIGGERING SPECIALIZED WATERMELON MODEL (Isolated Pipeline) ---")
-            watermelon_res = self.watermelon_specialized_model.predict(image_data)
-            return {
-                **watermelon_res,
-                "affected_area_percentage": watermelon_res.get("affected_area_percentage", random.randint(10, 30)),
-                "detected_at": datetime.utcnow().isoformat()
-            }
+            try:
+                print(f"--- TRIGGERING SPECIALIZED WATERMELON MODEL (Isolated Pipeline) ---")
+                watermelon_res = self.watermelon_specialized_model.predict(image_data)
+                
+                if watermelon_res.get("disease_name") == "Healthy" and watermelon_res.get("error"):
+                     print(f"--- Specialized Watermelon model failed. Falling back to V7 Standard Engine. ---")
+                else:
+                    return {
+                        **watermelon_res,
+                        "affected_area_percentage": watermelon_res.get("affected_area_percentage", random.randint(10, 30)),
+                        "detected_at": datetime.utcnow().isoformat()
+                    }
+            except Exception as e:
+                print(f"CRITICAL ERROR in specialized Watermelon model: {e}")
+                # Fall through to V7
 
         # 1d. Specialized Branch: Maize (Independent Isolation)
         if "maize" in crop_name or "corn" in crop_name:
-            print(f"--- TRIGGERING SPECIALIZED MAIZE MODEL (Isolated Pipeline) ---")
-            maize_res = self.maize_specialized_model.predict(image_data)
-            
-            # Fallback logic: If specialized model is offline, use the standard V7 engine (which supports Corn)
-            if maize_res.get("disease_name") == "Maize Diagnostic Offline":
-                print(f"--- Specialized Maize model is OFFLINE. Falling back to V7 Standard Engine. ---")
-                # Continue to step 2 instead of returning
-            else:
-                return {
-                    **maize_res,
-                    "affected_area_percentage": maize_res.get("affected_area_percentage", random.randint(18, 45)),
-                    "detected_at": datetime.utcnow().isoformat()
-                }
+            try:
+                print(f"--- TRIGGERING SPECIALIZED MAIZE MODEL (Isolated Pipeline) ---")
+                maize_res = self.maize_specialized_model.predict(image_data)
+                
+                # Fallback logic: If specialized model is offline, use the standard V7 engine (which supports Corn)
+                if maize_res.get("disease_name") == "Maize Diagnostic Offline":
+                    print(f"--- Specialized Maize model is OFFLINE. Falling back to V7 Standard Engine. ---")
+                    # Continue to step 2 instead of returning
+                else:
+                    return {
+                        **maize_res,
+                        "affected_area_percentage": maize_res.get("affected_area_percentage", random.randint(18, 45)),
+                        "detected_at": datetime.utcnow().isoformat()
+                    }
+            except Exception as e:
+                print(f"CRITICAL ERROR in specialized Maize model: {e}")
+                # Fall through to V7
 
         # 2. Run standard ML Prediction (v6/v7 optimized)
         # Pass crop_name to enable crop-aware softmax filtering in v7 engine

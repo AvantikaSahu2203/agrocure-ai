@@ -21,31 +21,10 @@ export default function RegisterPage() {
         setError('')
 
         try {
-            // 1. Create User
-            await api.post('/users/', {
-                email,
-                password,
-                full_name: fullName,
-            });
-
-            // 2. Automatically Log In
-            const params = new URLSearchParams();
-            params.append('username', email);
-            params.append('password', password);
-
-            const loginRes = await api.post('/login/access-token', params, {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
-
-            if (loginRes.data.access_token) {
-                localStorage.setItem('token', loginRes.data.access_token);
-                localStorage.setItem('user_email', email);
-                router.push('/farmer');
-            } else {
-                setError('Registration successful but login failed. Please sign in manually.');
-            }
+            // Bypass logic as requested by user to skip registration/login
+            localStorage.setItem('token', 'dummy_token_for_preview');
+            localStorage.setItem('user_email', email || 'test@test.com');
+            router.push('/farmer');
         } catch (err: any) {
             console.error('Registration/Login error:', err);
             setError(err.response?.data?.detail || 'An error occurred during registration. Please try again.');

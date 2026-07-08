@@ -107,11 +107,27 @@ export default function AdvisoryPage() {
                                 <SelectValue placeholder="Select Crop" />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl">
-                                <SelectItem value="Tomato">Tomato</SelectItem>
-                                <SelectItem value="Potato">Potato</SelectItem>
-                                <SelectItem value="Wheat">Wheat</SelectItem>
-                                <SelectItem value="Rice">Rice</SelectItem>
-                                <SelectItem value="Grape">Grape</SelectItem>
+                                <SelectItem value="Apple">🍎 Apple</SelectItem>
+                                <SelectItem value="Blueberry">🫐 Blueberry</SelectItem>
+                                <SelectItem value="Brinjal">🍆 Brinjal</SelectItem>
+                                <SelectItem value="Cherry">🍒 Cherry</SelectItem>
+                                <SelectItem value="Cotton">☁️ Cotton</SelectItem>
+                                <SelectItem value="Cucumber">🥒 Cucumber</SelectItem>
+                                <SelectItem value="Grape">🍇 Grape</SelectItem>
+                                <SelectItem value="Maize">🌽 Maize (Corn)</SelectItem>
+                                <SelectItem value="Mango">🥭 Mango</SelectItem>
+                                <SelectItem value="Orange">🍊 Orange</SelectItem>
+                                <SelectItem value="Peach">🍑 Peach</SelectItem>
+                                <SelectItem value="Pepper">🫑 Pepper</SelectItem>
+                                <SelectItem value="Potato">🥔 Potato</SelectItem>
+                                <SelectItem value="Raspberry">🍇 Raspberry</SelectItem>
+                                <SelectItem value="Rice">🌾 Rice</SelectItem>
+                                <SelectItem value="Soybean">🫛 Soybean</SelectItem>
+                                <SelectItem value="Squash">🎃 Squash</SelectItem>
+                                <SelectItem value="Strawberry">🍓 Strawberry</SelectItem>
+                                <SelectItem value="Tomato">🍅 Tomato</SelectItem>
+                                <SelectItem value="Watermelon">🍉 Watermelon</SelectItem>
+                                <SelectItem value="Wheat">🌾 Wheat</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

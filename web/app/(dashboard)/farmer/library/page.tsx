@@ -48,6 +48,7 @@ export default function DiseaseLibraryPage() {
             case 'potato': return <div className="bg-amber-100 p-3 rounded-xl"><div className="h-6 w-6 rounded-full bg-amber-500/20 flex items-center justify-center"><div className="h-4 w-4 rounded-full bg-amber-600"></div></div></div>
             case 'wheat': return <div className="bg-yellow-100 p-3 rounded-xl"><Wheat className="h-6 w-6 text-yellow-600" /></div>
             case 'rice': return <div className="bg-green-100 p-3 rounded-xl"><Sprout className="h-6 w-6 text-green-600" /></div>
+            case 'maize': return <div className="bg-yellow-50 p-3 rounded-xl"><Wheat className="h-6 w-6 text-yellow-500" /></div>
             case 'grape': return <div className="bg-purple-100 p-3 rounded-xl"><Grape className="h-6 w-6 text-purple-600" /></div>
             default: return <div className="bg-green-50 p-3 rounded-xl"><Leaf className="h-6 w-6 text-green-500" /></div>
         }

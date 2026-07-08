@@ -11,11 +11,11 @@ export function Navbar() {
                     <span className="text-xl font-bold text-gray-900">AgroCure AI</span>
                 </Link>
                 <div className="ml-auto flex gap-4">
-                    <Link href="/login">
-                        <Button variant="ghost">Login</Button>
+                    <Link href="/farmer">
+                        <Button variant="ghost">Dashboard</Button>
                     </Link>
-                    <Link href="/register">
-                        <Button>Get Started</Button>
+                    <Link href="/farmer/disease-check">
+                        <Button>Scan Crop</Button>
                     </Link>
                 </div>
             </div>

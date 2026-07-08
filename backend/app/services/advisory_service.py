@@ -42,7 +42,7 @@ def generate_crop_advice(data: AdvisoryRequest, current_user: Any) -> Dict[str, 
             "moisture_alert": "सावधान! उच्च नमी ({humidity}%) बीमारी ला सकती है, इसलिए अपने स्प्रे तैयार रखें। ",
             "perfect_weather": "आज खेती के लिए मौसम एकदम सही है। आप बहुत अच्छा काम कर रहे हैं!",
             "Low": "कम", "Moderate": "मध्यम", "High": "उच्च",
-            "Seedling": "अंकुर", "Vegetative": "वानस्पतिक", "Flowering": "फूल", "Harvest": "कटाई"
+            "Seedling": "अंकुर", "Vegetative": "वानस्पतिक", "Flowering": "फूल", "Fruiting": "फलन", "Harvest": "कटाई"
         },
         "en": {
             "summary_template": "{temp}°C with {humidity}% humidity. Rainfall: {rainfall}mm.",

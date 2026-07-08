@@ -12,6 +12,19 @@ class Settings:
     if db_url and db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     
+    # Connection validation for PostgreSQL to prevent startup/auth crashes
+    if db_url and db_url.startswith("postgresql"):
+        try:
+            from sqlalchemy import create_engine
+            # Use a short timeout (3 seconds) to check if the DB is reachable
+            temp_engine = create_engine(db_url, connect_args={"connect_timeout": 3})
+            with temp_engine.connect() as conn:
+                pass
+            temp_engine.dispose()
+        except Exception as e:
+            print(f"WARNING: PostgreSQL database connection failed: {e}. Falling back to SQLite.")
+            db_url = None
+    
     DATABASE_URL: str = db_url or f"sqlite:///{_DEFAULT_DB_PATH}"
     
     SECRET_KEY: str = os.getenv("SECRET_KEY", "7b9e8c1d2e3f4a5b6c7d8e9f0a1b2c3d") 

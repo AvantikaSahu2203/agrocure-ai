@@ -12,12 +12,14 @@ class WatermelonInference:
     Uses the trained model: watermelon_disease_v1.keras
     """
     def __init__(self):
-        # Use the specific backend directory path
-        self.model_path = os.path.join(os.path.dirname(__file__), "watermelon_disease_v1.keras")
-        
-        # Fallback to current working directory
-        if not os.path.exists(self.model_path):
-            self.model_path = os.path.join(os.getcwd(), "watermelon_disease_v1.keras")
+        # Multiple possible paths for the model
+        self.possible_paths = [
+            os.path.join(os.path.dirname(__file__), "watermelon_disease_v1.keras"),
+            os.path.join(os.getcwd(), "app", "ml", "watermelon", "watermelon_disease_v1.keras"),
+            os.path.join(os.getcwd(), "watermelon_disease_v1.keras"),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "watermelon_disease_v1.keras")
+        ]
+        self.model_path = None
 
         
         self.model = None
@@ -79,16 +81,20 @@ class WatermelonInference:
     def _load_model(self):
         if self.model is not None:
             return True
-        try:
-            if os.path.exists(self.model_path):
-                # Load with compile=False to avoid dependency on custom objects/losses during inference
-                self.model = keras.models.load_model(self.model_path, compile=False)
-                print(f"[WatermelonInference] Dedicated model loaded from {self.model_path}")
-                return True
-            else:
-                print(f"[WatermelonInference] Model not found at {self.model_path}")
-        except Exception as e:
-            print(f"[WatermelonInference] Failed to load model: {e}")
+        
+        # Try each possible path
+        for path in self.possible_paths:
+            if os.path.exists(path):
+                try:
+                    # Load with compile=False to avoid dependency on custom objects/losses during inference
+                    self.model = keras.models.load_model(path, compile=False)
+                    self.model_path = path
+                    print(f"[WatermelonInference] Dedicated model loaded from {path}")
+                    return True
+                except Exception as e:
+                    print(f"[WatermelonInference] Failed to load model from {path}: {e}")
+        
+        print(f"[WatermelonInference] No model found in any searched locations.")
         return False
 
     def predict(self, image_bytes: bytes):

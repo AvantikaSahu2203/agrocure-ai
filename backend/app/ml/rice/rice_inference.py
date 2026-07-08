@@ -41,13 +41,13 @@ class RiceInference:
             # 1. Brown spots (Brown Spot / Blast)
             lower_brown = np.array([10, 50, 20])
             upper_brown = np.array([30, 255, 200])
-            brown_mask = cv2.in_range(hsv, lower_brown, upper_brown)
+            brown_mask = cv2.inRange(hsv, lower_brown, upper_brown)
             brown_ratio = cv2.countNonZero(brown_mask) / (img.shape[0] * img.shape[1])
             
             # 2. Yellowing (Blight / Deficiency)
             lower_yellow = np.array([20, 100, 100])
             upper_yellow = np.array([40, 255, 255])
-            yellow_mask = cv2.in_range(hsv, lower_yellow, upper_yellow)
+            yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
             yellow_ratio = cv2.countNonZero(yellow_mask) / (img.shape[0] * img.shape[1])
 
             if brown_ratio > 0.05:

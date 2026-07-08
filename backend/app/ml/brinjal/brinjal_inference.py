@@ -13,10 +13,16 @@ class BrinjalInference:
     Architecture defined in-code to avoid Keras 3 deserialization bugs.
     """
     def __init__(self):
-        # Manual Weights Path (Extracted from user ZIP)
-        self.weights_path = r"c:\Users\ASUS\Desktop\mobileapp\brinjal_extracted\model.weights.h5"
-        self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
+        # 1. Search for weights in multiple locations
+        self.possible_weights = [
+            os.path.join(os.getcwd(), "brinjal_extracted", "model.weights.h5"),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "mobileapp", "brinjal_extracted", "model.weights.h5"),
+            os.path.join(os.path.dirname(__file__), "model.weights.h5"),
+            os.path.join(os.getcwd(), "model.weights.h5")
+        ]
         
+        self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
+        self.weights_path = None
         self.model = None
         
         # EXACT class names from training (7 classes)
@@ -66,43 +72,56 @@ class BrinjalInference:
 
     def _build_architecture(self):
         """Rebuild the exact architecture from training."""
-        inputs = keras.Input(shape=(224, 224, 3))
-        base_model = keras.applications.MobileNetV2(
-            input_shape=(224, 224, 3),
-            include_top=False,
-            weights=None
-        )
-        x = base_model(inputs)
-        x = keras.layers.GlobalAveragePooling2D()(x)
-        x = keras.layers.Dense(128, activation='relu')(x)
-        x = keras.layers.Dropout(0.5)(x)
-        outputs = keras.layers.Dense(len(self.class_names), activation='softmax')(x)
-        
-        model = keras.Model(inputs, outputs)
-        return model
+        try:
+            inputs = keras.Input(shape=(224, 224, 3))
+            base_model = keras.applications.MobileNetV2(
+                input_shape=(224, 224, 3),
+                include_top=False,
+                weights=None
+            )
+            x = base_model(inputs)
+            x = keras.layers.GlobalAveragePooling2D()(x)
+            x = keras.layers.Dense(128, activation='relu')(x)
+            x = keras.layers.Dropout(0.5)(x)
+            outputs = keras.layers.Dense(len(self.class_names), activation='softmax')(x)
+            
+            model = keras.Model(inputs, outputs)
+            return model
+        except Exception as e:
+            print(f"[BrinjalInference] Architecture build failed: {e}")
+            return None
 
     def _load_model(self):
         if self.model is not None:
             return True
             
+        # Try finding weights
+        for p in self.possible_weights:
+            if os.path.exists(p):
+                self.weights_path = p
+                break
+
         try:
             # 1. Try Keras 3 direct loading
             if os.path.exists(self.model_path):
                 self.model = keras.models.load_model(self.model_path, compile=False)
+                print(f"[BrinjalInference] Direct model loaded from {self.model_path}")
                 return True
         except Exception as e:
             print(f"[BrinjalInference] Direct load failed: {e}")
 
         try:
             # 2. Rebuild architecture and load weights (Guaranteed Fallback)
-            if os.path.exists(self.weights_path):
+            if self.weights_path and os.path.exists(self.weights_path):
                 print(f"[BrinjalInference] Rebuilding architecture and loading weights from {self.weights_path}")
                 self.model = self._build_architecture()
-                self.model.load_weights(self.weights_path)
-                return True
+                if self.model:
+                    self.model.load_weights(self.weights_path)
+                    return True
         except Exception as e:
             print(f"[BrinjalInference] Weights load failed: {e}")
             
+        print(f"[BrinjalInference] Model could not be loaded from any source.")
         return False
 
 
