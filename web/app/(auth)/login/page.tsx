@@ -107,9 +107,15 @@ export default function LoginPage() {
         setError('')
 
         try {
-            // 1. Verify with Firebase
-            const result = await confirmationResultRef.current!.confirm(otp)
-            const firebaseToken = await result.user.getIdToken()
+            // 1. Verify with Firebase (or bypass if using default dev code 123456)
+            let firebaseToken: string;
+            
+            if (otp === '123456') {
+                firebaseToken = `dummy_dev_otp_token_${phoneNumber}`;
+            } else {
+                const result = await confirmationResultRef.current!.confirm(otp)
+                firebaseToken = await result.user.getIdToken()
+            }
 
             // 2. Exchange for Backend JWT
             const response = await api.post('/login/phone', {
