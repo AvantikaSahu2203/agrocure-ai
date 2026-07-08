@@ -1,0 +1,147 @@
+export const translations = {
+  en: {
+    // Sidebar
+    dashboard: "Dashboard",
+    myCrops: "My Crops",
+    diseaseCheck: "Disease Check",
+    nearbyStores: "Nearby Stores",
+    reports: "Reports",
+    smartAdvisory: "Smart Advisory",
+    profile: "Profile",
+    signOut: "Sign Out",
+    
+    // Disease Check Page
+    cropDiagnosis: "Crop Disease Diagnosis",
+    analysisTitle: "Disease Analysis",
+    analysisDesc: "Upload a leaf photo and specify the crop for accurate diagnosis.",
+    cropName: "Crop Name",
+    cropPlaceholder: "e.g. Tomato, Mango, Rice",
+    region: "City/Region",
+    regionPlaceholder: "e.g. Pune, Nagpur",
+    plantImage: "Plant Image",
+    useSample: "Use Sample Image",
+    runDiagnostic: "Run Full Diagnostic",
+    analyzing: "Analyzing Plant...",
+    
+    // Results
+    resultsPlaceholder: "Analysis results will appear here after scanning.",
+    processing: "Processing leaf imagery and environmental context...",
+    confidence: "CONFIDENCE",
+    severity: "SEVERITY",
+    affectedArea: "AFFECTED AREA",
+    diagnosticReasoning: "Diagnostic Reasoning",
+    detectedSymptoms: "Detected Symptoms:",
+    recommendedSolutions: "Recommended Solutions",
+    chemicalTreatment: "CHEMICAL TREATMENT",
+    organicAlternative: "ORGANIC ALTERNATIVE",
+    dosage: "DOSAGE & APPLICATION",
+    preventativeMeasures: "Preventative Measures:",
+    environmentalRisk: "Environmental Risk Context",
+    advisory: "Advisory:",
+    
+    // Dashboard
+    protectCrops: "Protect Your Crops with AI",
+    scanDetectCure: "Scan, detect, and cure crop diseases instantly",
+    weatherPartlyCloudy: "Partly Cloudy",
+    weatherHumidity: "Humidity",
+    weatherWind: "Wind",
+    fungalRisk: "Fungal Risk",
+    quickActions: "Quick Actions",
+    scanDisease: "Scan Disease",
+    aiPowered: "AI-powered detection",
+    diseaseLibrary: "Disease Library",
+    browseAll: "Browse all diseases",
+    buyMedicine: "Buy Medicine",
+    orderOnline: "Order online",
+    findAgroShops: "Find agro shops",
+    cropReports: "Crop Reports",
+    healthAnalytics: "Health analytics",
+    talkToExpert: "Talk to Expert",
+    getGuidance: "Get guidance",
+    recentScans: "Recent Scans",
+    severityHigh: "High",
+    severityNone: "None",
+    hoursAgo: "hours ago",
+    yesterdayLocal: "Yesterday",
+    daysAgo: "days ago",
+    
+    // Global
+    loading: "Loading...",
+    error: "Error",
+    selectLanguage: "Select Language"
+  },
+  hi: {
+    // Sidebar
+    dashboard: "डैशबोर्ड",
+    myCrops: "मेरी फसलें",
+    diseaseCheck: "रोग की जांच",
+    nearbyStores: "नजदीकी दुकानें",
+    reports: "रिपोर्ट",
+    smartAdvisory: "स्मार्ट सलाह",
+    profile: "प्रोफ़ाइल",
+    signOut: "साइन आउट",
+    
+    // Disease Check Page
+    cropDiagnosis: "फसल रोग निदान",
+    analysisTitle: "रोग विश्लेषण",
+    analysisDesc: "सटीक निदान के लिए पत्ती का फोटो अपलोड करें और फसल निर्दिष्ट करें।",
+    cropName: "फसल का नाम",
+    cropPlaceholder: "उदा. टमाटर, आम, चावल",
+    region: "शहर/क्षेत्र",
+    regionPlaceholder: "उदा. पुणे, नागपुर",
+    plantImage: "पौधे की छवि",
+    useSample: "नमूना छवि उपयोग करें",
+    runDiagnostic: "पूर्ण निदान चलाएं",
+    analyzing: "पौधे का विश्लेषण हो रहा है...",
+    
+    // Results
+    resultsPlaceholder: "स्कैनिंग के बाद विश्लेषण परिणाम यहां दिखाई देंगे।",
+    processing: "पत्ती के चित्रण और पर्यावरणीय संदर्भ का प्रसंस्करण...",
+    confidence: "विश्वास",
+    severity: "गंभीरता",
+    affectedArea: "प्रभावित क्षेत्र",
+    diagnosticReasoning: "नैदानिक तर्क",
+    detectedSymptoms: "पाए गए लक्षण:",
+    recommendedSolutions: "अनुशंसित समाधान",
+    chemicalTreatment: "रासायनिक उपचार",
+    organicAlternative: "जैविक विकल्प",
+    dosage: "खुराक और आवेदन",
+    preventativeMeasures: "निवारक उपाय:",
+    environmentalRisk: "पर्यावरण जोखिम संदर्भ",
+    advisory: "सलाह:",
+    
+    // Dashboard
+    protectCrops: "एआई के साथ अपनी फसलों की रक्षा करें",
+    scanDetectCure: "फसल रोगों को तुरंत स्कैन करें, पहचानें और ठीक करें",
+    weatherPartlyCloudy: "आंशिक रूप से बादल",
+    weatherHumidity: "नमी",
+    weatherWind: "हवा",
+    fungalRisk: "कवक जोखिम",
+    quickActions: "त्वरित कार्रवाई",
+    scanDisease: "रोग स्कैन करें",
+    aiPowered: "एआई-आधारित पहचान",
+    diseaseLibrary: "रोग पुस्तकालय",
+    browseAll: "सभी रोगों को देखें",
+    buyMedicine: "दवा खरीदें",
+    orderOnline: "ऑनलाइन ऑर्डर करें",
+    findAgroShops: "कृषि दुकानें खोजें",
+    cropReports: "फसल रिपोर्ट",
+    healthAnalytics: "स्वास्थ्य विश्लेषण",
+    talkToExpert: "विशेषज्ञ से बात करें",
+    getGuidance: "मार्गदर्शन प्राप्त करें",
+    recentScans: "हालिया स्कैन",
+    severityHigh: "उच्च",
+    severityNone: "कोई नहीं",
+    hoursAgo: "घंटे पहले",
+    yesterdayLocal: "कल",
+    daysAgo: "दिन पहले",
+    
+    // Global
+    loading: "लोड हो रहा है...",
+    error: "त्रुटि",
+    selectLanguage: "भाषा चुनें"
+  }
+};
+
+export type Language = 'en' | 'hi';
+export type TranslationKey = keyof typeof translations.en;
