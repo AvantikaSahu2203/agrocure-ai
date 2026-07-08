@@ -21,7 +21,13 @@ class BrinjalInference:
             os.path.join(os.getcwd(), "model.weights.h5")
         ]
         
-        self.model_path = os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras")
+        # Try different locations for the model
+        model_locations = [
+            os.path.join(os.path.dirname(__file__), "brinjal_disease_model_user.keras"),
+            os.path.join(os.getcwd(), "brinjal_disease_model_user.keras"),
+            os.path.join(os.getcwd(), "backend", "brinjal_disease_model_user.keras"),
+        ]
+        self.model_path = next((p for p in model_locations if os.path.exists(p)), model_locations[0])
         self.weights_path = None
         self.model = None
         
