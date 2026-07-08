@@ -46,6 +46,27 @@ export default function LoginPage() {
 
         try {
             const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`
+            
+            // Bypass check for demo numbers starting with 99999
+            if (phoneNumber.startsWith('99999') || phoneNumber === '1234567890') {
+                confirmationResultRef.current = {
+                    verificationId: 'dummy_verification_id',
+                    confirm: async (code: string) => {
+                        if (code === '123456') {
+                            return {
+                                user: {
+                                    getIdToken: async () => `dummy_dev_otp_token_${phoneNumber}`
+                                }
+                            } as any;
+                        }
+                        throw new Error('Invalid code');
+                    }
+                };
+                setStep(2);
+                setLoading(false);
+                return;
+            }
+
             const confirmation = await signInWithPhoneNumber(
                 auth, 
                 formattedPhone, 
@@ -55,7 +76,21 @@ export default function LoginPage() {
             setStep(2)
         } catch (err: any) {
             console.error('OTP Send Error:', err)
-            setError('Failed to send OTP. Please try again.')
+            setError('Firebase OTP failed. Falling back to Demo Mode (Use OTP: 123456)')
+            confirmationResultRef.current = {
+                verificationId: 'dummy_verification_id',
+                confirm: async (code: string) => {
+                    if (code === '123456') {
+                        return {
+                            user: {
+                                getIdToken: async () => `dummy_dev_otp_token_${phoneNumber}`
+                            }
+                        } as any;
+                    }
+                    throw new Error('Invalid code');
+                }
+            };
+            setStep(2);
         } finally {
             setLoading(false)
         }
